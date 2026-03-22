@@ -1,0 +1,16 @@
+annotated-doc==0.0.4
+annotated-types==0.7.0
+anyio==4.12.1
+click==8.3.1
+fastapi==0.135.1
+h11==0.16.0
+idna==3.11
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+pydantic==2.12.5
+pydantic_core==2.41.5
+python-multipart==0.0.22
+starlette==1.0.0
+typing-inspection==0.4.2
+typing_extensions==4.15.0
+uvicorn==0.42.0
