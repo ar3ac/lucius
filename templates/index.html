@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Command Runner</title>
+</head>
+<body>
+    <h1>Command Runner</h1>
+    {% for command, command_params in commands.items() %}
+    <div class="command">
+    <form action="/run" method="post">
+        <input type="hidden" name="command" value="{{ command }}">
+        <button type="submit">{{ command }}</button>
+        <p>{{ command_params }}</p>
+    </form>
+    </div>
+    {% endfor %}
+    {% if output %}
+    <div class="output">
+        {{ output }}
+    </div>
+    {% endif %}
+</body>
+</html>
+    </div>
+    {% endif %}
+</body>
+</html>

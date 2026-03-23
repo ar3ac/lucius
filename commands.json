@@ -1,0 +1,6 @@
+ {
+    "shutdown": "sudo shutdown -h now",
+    "reboot": "sudo reboot",
+    "restart_minidlna": "sudo systemctl restart minidlna",
+    "uptime": "uptime -p"
+  }
