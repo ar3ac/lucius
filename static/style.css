@@ -35,6 +35,11 @@ body {
     padding: 2rem 1rem;
     max-width: 800px;
     line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 h1, h2, h3 {
