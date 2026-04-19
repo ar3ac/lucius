@@ -108,7 +108,7 @@ Cleanly removes the service, files, and all traces. Zero leftovers.
 
 Lucius is designed for **trusted LAN use**. It is **not** recommended to expose it directly to the public internet without additional protection.
 
-- Access is protected by a PIN stored in the `.env` file
+- Access is protected by a PIN stored in the `.env` file (must be located in the project root folder)
 - The backend executes **only** commands explicitly saved in the whitelist — arbitrary shell injection is impossible by design
 
 **Using `sudo` commands?** Add a `NOPASSWD` rule in `/etc/sudoers` for the specific commands you need, otherwise Lucius will timeout waiting for a password prompt:
