@@ -42,7 +42,12 @@ echo "♻️ Restoring user configurations..."
 [ -f commands.json.bak ] && mv commands.json.bak commands.json
 [ -f settings.json.bak ] && mv settings.json.bak settings.json
 
-# 5. Update dependencies
+# 5. Restore permissions for the web app
+TARGET_USER=${SUDO_USER:-root}
+echo "🔑 Restoring ownership for $TARGET_USER..."
+chown -R $TARGET_USER:$TARGET_USER $INSTALL_DIR
+
+# 6. Update dependencies
 echo "📦 Updating Python dependencies..."
 source .venv/bin/activate
 pip install -r requirements.txt
