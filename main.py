@@ -22,6 +22,25 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
+SETTINGS_FILE = "settings.json"
+
+def load_settings():
+    if not os.path.exists(SETTINGS_FILE):
+        return {"server_name": "Lucius"}
+    try:
+        with open(SETTINGS_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return {"server_name": "Lucius"}
+
+def save_settings(settings_dict):
+    with open(SETTINGS_FILE, "w") as f:
+        json.dump(settings_dict, f, indent=4)
+
+def get_server_name():
+    return load_settings().get("server_name", "Lucius")
+
+
 def load_commands():
     try:
         with open("commands.json", "r") as f:
