@@ -78,6 +78,11 @@ sed -e "s|__INSTALL_DIR__|$INSTALL_DIR|g" \
 
 # Reload systemd and start service
 systemctl daemon-reload
+
+# Ensure the target user owns the installation directory for write permissions
+echo "🔑 Adjusting permissions for $TARGET_USER..."
+chown -R $TARGET_USER:$TARGET_USER $INSTALL_DIR
+
 systemctl enable lucius
 systemctl restart lucius
 
