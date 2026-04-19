@@ -42,6 +42,12 @@ else
     cd $INSTALL_DIR
 fi
 
+# Initialize default commands
+if [ ! -f "commands.json" ] && [ -f "commands.example.json" ]; then
+    echo "📄 Initializing default commands..."
+    cp commands.example.json commands.json
+fi
+
 # Setup Virtual Environment
 echo "🐍 Setting up Python Virtual Environment..."
 python3 -m venv .venv

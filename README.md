@@ -19,6 +19,7 @@
 * 🚀 **Quick Actions**: Execute bash scripts, restart services, clear caches, all with a single tap. No SSH terminal required.
 * 🛡️ **Security**: PIN authentication (`.env`) and strict Command Whitelisting (no shell injection possible).
 * ⚙️ **Dynamic Management**: Add, edit, or delete your custom commands directly from the web interface.
+* 🖥️ **Custom Server Names**: Easily identify the machine you are controlling via a customizable server badge.
 * 🌍 **Universal**: Works natively on Ubuntu, Debian, Raspberry Pi OS, Fedora, and any systemd-based Linux distribution.
 * 🔄 **Built-in Lifecycle**: Includes automated installation, uninstallation, and update scripts.
 
@@ -55,7 +56,7 @@ This will cleanly stop and disable the systemd service, remove the service file,
 
 ## 📁 Folder Structure
 * `main.py` - Core FastAPI logic and routing.
-* `commands.json` - Your local "database" of saved commands.
+* `commands.json` / `settings.json` - Your local configuration files (generated locally).
 * `lucius.service` - Systemd template to run the app in the background.
 * `install.sh` - Universal Linux automated installer.
 * `templates/` - HTML files (Jinja2) for rendering interfaces.

@@ -5,3 +5,5 @@ venv/
 .env
 todo.md
 TODO.md
+commands.json
+settings.json

@@ -26,13 +26,23 @@ if systemctl is-active --quiet ${SERVICE_NAME}; then
     systemctl stop ${SERVICE_NAME}
 fi
 
-# 2. Git Pull latest changes
-echo "📥 Pulling latest changes from GitHub..."
+# 2. Backup user data
+echo "💾 Backing up user configurations..."
 cd $INSTALL_DIR
+[ -f commands.json ] && cp commands.json commands.json.bak
+[ -f settings.json ] && cp settings.json settings.json.bak
+
+# 3. Git Pull latest changes
+echo "📥 Pulling latest changes from GitHub..."
 git fetch origin main
 git reset --hard origin/main
 
-# 3. Update dependencies
+# 4. Restore user data
+echo "♻️ Restoring user configurations..."
+[ -f commands.json.bak ] && mv commands.json.bak commands.json
+[ -f settings.json.bak ] && mv settings.json.bak settings.json
+
+# 5. Update dependencies
 echo "📦 Updating Python dependencies..."
 source .venv/bin/activate
 pip install -r requirements.txt
