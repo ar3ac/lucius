@@ -13,6 +13,10 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Detect current owner of the directory to restore it later
+CURRENT_OWNER=$(stat -c '%u:%g' $INSTALL_DIR)
+echo "👤 Current directory owner detected as: $CURRENT_OWNER"
+
 if [ ! -d "$INSTALL_DIR" ]; then
     echo "❌ Lucius is not installed in $INSTALL_DIR."
     exit 1
@@ -43,9 +47,8 @@ echo "♻️ Restoring user configurations..."
 [ -f settings.json.bak ] && mv settings.json.bak settings.json
 
 # 5. Restore permissions for the web app
-TARGET_USER=${SUDO_USER:-root}
-echo "🔑 Restoring ownership for $TARGET_USER..."
-chown -R $TARGET_USER:$TARGET_USER $INSTALL_DIR
+echo "🔑 Restoring ownership to $CURRENT_OWNER..."
+chown -R $CURRENT_OWNER $INSTALL_DIR
 
 # 6. Update dependencies
 echo "📦 Updating Python dependencies..."
