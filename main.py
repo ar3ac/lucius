@@ -33,8 +33,13 @@ def load_settings():
         return {"server_name": "Lucius"}
 
 def save_settings(settings_dict):
-    with open(SETTINGS_FILE, "w") as f:
-        json.dump(settings_dict, f, indent=4)
+    try:
+        with open(SETTINGS_FILE, "w") as f:
+            json.dump(settings_dict, f, indent=4)
+        return True
+    except Exception as e:
+        print(f"Error saving settings: {e}")
+        return False
 
 def get_server_name():
     return load_settings().get("server_name", "Lucius")
@@ -79,10 +84,31 @@ def index(request: Request, _ = Depends(check_auth)):
 
 @app.post("/settings")
 def update_settings(request: Request, server_name: str = Form(...), _ = Depends(check_auth)):
-    settings = load_settings()
-    settings["server_name"] = server_name.strip() or "Lucius"
-    save_settings(settings)
-    return RedirectResponse(url="/manage", status_code=303)
+    try:
+        settings = load_settings()
+        settings["server_name"] = server_name.strip() or "Lucius"
+        if not save_settings(settings):
+             return templates.TemplateResponse(
+                request=request, 
+                name="manage.html", 
+                context={
+                    "commands": load_commands(), 
+                    "error": "Error: Could not save settings. Check folder permissions.", 
+                    "server_name": get_server_name()
+                }
+            )
+        return RedirectResponse(url="/manage", status_code=303)
+    except Exception as e:
+        return templates.TemplateResponse(
+            request=request, 
+            name="manage.html", 
+            context={
+                "commands": load_commands(), 
+                "error": f"Internal Error: {str(e)}", 
+                "server_name": get_server_name()
+            }
+        )
+
 
 @app.get("/manage")
 def manage(request: Request, _ = Depends(check_auth)):
