@@ -1,5 +1,5 @@
 [Unit]
-Description=Lucius (PiCmdHub) Web App
+Description=Lucius Web Controller
 After=network.target
 
 [Service]

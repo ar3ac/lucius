@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request, Form, Depends, HTTPException, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
-from pathlib import Path
 from dotenv import load_dotenv
 import subprocess, json, re, os
 
