@@ -13,9 +13,9 @@
             <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
-    <br>
-    <main style="display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-end; padding-bottom: 2rem;">
-    <section class="manage-panel" style="border: none; background: transparent; box-shadow: none; padding: 0;">
+    
+    <main style="display: flex; flex-direction: column; flex-grow: 1; padding-bottom: 2rem;">
+    <section class="manage-panel" style="border: none; background: transparent; box-shadow: none; padding: 0; margin-top: auto;">
         <h2 class="section-title" style="border: none; padding-bottom: 0;">Select a command to execute:</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
         {% for command, command_params in commands.items() %}
