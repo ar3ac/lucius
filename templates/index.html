@@ -18,8 +18,8 @@
             <div class="command">
                 <form action="/run" method="post">
                     <input type="hidden" name="command" value="{{ command }}">
-                    <button type="submit" class="command-btn" style="width: 100%; justify-content: flex-start;"><i class="fas fa-play"></i> {{ command }}</button>
-                    <p style="margin: 0; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted); font-family: monospace; word-break: break-all;">$ {{ command_params }}</p>
+                    <button type="submit" class="command-btn" style="justify-content: center;"><i class="fas fa-play"></i> {{ command }}</button>
+                    <p>$ {{ command_params }}</p>
                 </form>
             </div>
         {% else %}
