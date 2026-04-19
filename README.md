@@ -2,11 +2,18 @@
 
 **An elegant Python web tool to launch custom shell commands on any Linux machine or server from any device.**
 
-<details>
-  <summary>🎥 <b>Click here to view the Demo Video</b></summary>
-  <br>
-  <img src="assets/demo.gif" width="100%" style="max-width: 500px; border-radius: 8px; border: 1px solid #e2e8f0;">
-</details>
+
+<table>
+  <tr>
+    <td align="center"><b>📱 Dashboard</b></td>
+    <td align="center"><b>⚙️ Command Management</b></td>
+  </tr>
+  <tr>
+    <td><img src="assets/screenshot_home.png" width="100%" style="border-radius:8px;"></td>
+    <td><img src="assets/screenshot_manage.png" width="100%" style="border-radius:8px;"></td>
+  </tr>
+</table>
+
 
 ## 🛠️ Tech Stack
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
