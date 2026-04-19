@@ -4,11 +4,11 @@ After=network.target
 
 [Service]
 # REPLACE: The username that will run the tool (e.g. pi, ubuntu, ar3ac)
-User=pi
+User=__USER__
 # REPLACE: The absolute path where the project folder is located
-WorkingDirectory=/home/pi/lucius
+WorkingDirectory=__INSTALL_DIR__
 # The uvicorn executable inside the virtualenv (.venv)
-ExecStart=/home/pi/lucius/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
+ExecStart=__INSTALL_DIR__/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=3
 

@@ -1,6 +1,6 @@
 # ⚡ Lucius
 
-**An elegant Python web tool to launch custom shell commands on your Raspberry Pi or local server from any device.**
+**An elegant Python web tool to launch custom shell commands on any Linux machine or server from any device.**
 
 ![Lucius Demo](assets/demo.webp)
 
@@ -8,48 +8,53 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=FastAPI&logoColor=white)
 ![Jinja](https://img.shields.io/badge/Jinja-B41717?style=for-the-badge&logo=jinja&logoColor=white)
-![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=Raspberry%20Pi&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
 ## ✨ Features
 * 📱 **Mobile-First Elegant Design**: A responsive, clean web interface inspired by modern tech designs.
 * 🚀 **Quick Actions**: Execute bash scripts, restart services, clear caches, all with a single tap. No SSH terminal required.
 * 🛡️ **Security**: PIN authentication (`.env`) and strict Command Whitelisting (no shell injection possible).
 * ⚙️ **Dynamic Management**: Add, edit, or delete your custom commands directly from the web interface.
+* 🌍 **Universal**: Works natively on Ubuntu, Debian, Raspberry Pi OS, Fedora, and any systemd-based Linux distribution.
 
-## 🚀 Quick Start
+## 🚀 Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ar3ac/lucius.git
-   cd lucius
-   ```
+The easiest way to install and start Lucius as a background service on your server is via the automated installation script. 
+Run this command on your target machine:
 
-2. **Create the environment and install dependencies**
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+```bash
+curl -sSL https://raw.githubusercontent.com/ar3ac/lucius/main/install.sh | sudo bash
+```
 
-3. **Set the security PIN**
-   Create a `.env` file based on the example:
-   ```bash
-   echo "LUCIUS_PIN=1234" > .env
-   ```
+The script will automatically:
+1. Install Python and necessary dependencies.
+2. Clone Lucius into `/opt/lucius`.
+3. Prompt you to create a secure `LUCIUS_PIN`.
+4. Configure and start the `lucius.service` via systemd.
 
-4. **Start the server**
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000
-   ```
-   Open `http://your-ip-address:8000` in your browser and login with the PIN!
+Once installed, simply open `http://<your-server-ip>:8000` in your browser.
+
+## 🔄 How to Update
+To securely update Lucius to the latest version, run the automated update script on your server:
+```bash
+sudo /opt/lucius/update.sh
+```
+This will automatically stop the service, pull the latest changes, update dependencies, and restart the service without losing your configuration.
+
+## 🗑️ How to Uninstall
+If you want to completely remove Lucius from your system, run the automated uninstaller:
+```bash
+sudo /opt/lucius/uninstall.sh
+```
+This will cleanly stop and disable the systemd service, remove the service file, and delete the `/opt/lucius` folder leaving zero traces.
 
 ## 📁 Folder Structure
 * `main.py` - Core FastAPI logic and routing.
 * `commands.json` - Your local "database" of saved commands.
-* `lucius.service` - Systemd template to run the app in the background on startup.
+* `lucius.service` - Systemd template to run the app in the background.
+* `install.sh` - Universal Linux automated installer.
 * `templates/` - HTML files (Jinja2) for rendering interfaces.
 * `static/` - CSS file for styling.
-* `.env` - (to be created) Contains the secret PIN.
 
 ## 🔒 Security and Best Practices
 Lucius is designed to run in your **Local Area Network (LAN)**. 
