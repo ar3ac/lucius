@@ -56,14 +56,21 @@ def logout():
 
 @app.get("/")
 def index(request: Request, _ = Depends(check_auth)):
-    return templates.TemplateResponse(request=request, name="index.html", context={"commands": load_commands(), "output": None, "error": None, "hostname": socket.gethostname()})
+    return templates.TemplateResponse(request=request, name="index.html", context={"commands": load_commands(), "output": None, "error": None, "server_name": get_server_name()})
 
+
+@app.post("/settings")
+def update_settings(request: Request, server_name: str = Form(...), _ = Depends(check_auth)):
+    settings = load_settings()
+    settings["server_name"] = server_name.strip() or "Lucius"
+    save_settings(settings)
+    return RedirectResponse(url="/manage", status_code=303)
 
 @app.get("/manage")
 def manage(request: Request, _ = Depends(check_auth)):
     commands = load_commands()
     return templates.TemplateResponse(
-        request=request, name="manage.html", context={"commands": commands, "hostname": socket.gethostname()}
+        request=request, name="manage.html", context={"commands": commands, "server_name": get_server_name()}
     )
 
 
@@ -80,7 +87,7 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
                 "output": None,
                 "error": "Security Error: Unauthorized command.",
                 "commands": commands_dict,
-                "hostname": socket.gethostname()
+                "server_name": get_server_name()
             },
         )
         
@@ -117,7 +124,7 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
             "output": output,
             "error": error,
             "commands": commands_dict,
-            "hostname": socket.gethostname()
+            "server_name": get_server_name()
         },
     )
 
@@ -134,7 +141,7 @@ def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _
             context={
                 "commands": load_commands(),
                 "error": "Error: Name can only contain letters, numbers, and underscores.",
-                "hostname": socket.gethostname()
+                "server_name": get_server_name()
             }
         )
         
@@ -148,7 +155,7 @@ def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _
             context={
                 "commands": commands,
                 "error": f"Error: A command named '{name}' already exists.",
-                "hostname": socket.gethostname()
+                "server_name": get_server_name()
             }
         )
         
@@ -178,7 +185,7 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
             request=request, name="manage.html", context={
-                "commands": load_commands(), "error": "Error: Name can only contain letters, numbers, and underscores.", "hostname": socket.gethostname()
+                "commands": load_commands(), "error": "Error: Name can only contain letters, numbers, and underscores.", "server_name": get_server_name()
             }
         )
         
@@ -190,7 +197,7 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
     if name != old_name and name in commands:
         return templates.TemplateResponse(
             request=request, name="manage.html", context={
-                "commands": commands, "error": f"Error: A command named '{name}' already exists.", "hostname": socket.gethostname()
+                "commands": commands, "error": f"Error: A command named '{name}' already exists.", "server_name": get_server_name()
             }
         )
         
