@@ -110,6 +110,7 @@ Lucius is designed for **trusted LAN use**. It is **not** recommended to expose 
 
 - Access is protected by a PIN stored in the `.env` file (must be located in the project root folder)
 - The backend executes **only** commands explicitly saved in the whitelist — arbitrary shell injection is impossible by design
+- **Directory Permissions**: Lucius needs write access to its folder to save `commands.json` and `settings.json`. If you install manually, ensure the user running the service owns the project folder: `sudo chown -R $USER:$USER /opt/lucius`.
 
 **Using `sudo` commands?** Add a `NOPASSWD` rule in `/etc/sudoers` for the specific commands you need, otherwise Lucius will timeout waiting for a password prompt:
 
