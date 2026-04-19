@@ -106,6 +106,8 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
     except subprocess.CalledProcessError as e:
         output = e.stdout
         error = e.stderr
+    except subprocess.TimeoutExpired:
+        error = "Error: Command timed out after 60 seconds. (Is it waiting for a sudo password?)"
     except FileNotFoundError:
         # Handle the case where the executable (e.g., 'uptime') is not found in the system
         error = f"Error: Executable not found for '{cmd_list[0]}'"

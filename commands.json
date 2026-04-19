@@ -3,5 +3,6 @@
     "reboot": "sudo reboot",
     "restart_minidlna": "sudo systemctl restart minidlna",
     "uptime": "uptime -p",
-    "Provazza": "ls"
+    "Provazza": "ls",
+    "Memory": "free -h"
 }

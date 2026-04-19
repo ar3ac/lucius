@@ -2,7 +2,11 @@
 
 **An elegant Python web tool to launch custom shell commands on any Linux machine or server from any device.**
 
-![Lucius Demo](assets/demo.webp)
+<details>
+  <summary>🎥 <b>Click here to view the Demo Video</b></summary>
+  <br>
+  <img src="assets/demo.webp" width="100%" style="max-width: 600px; border-radius: 8px; border: 1px solid #e2e8f0;">
+</details>
 
 ## 🛠️ Tech Stack
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
@@ -16,6 +20,7 @@
 * 🛡️ **Security**: PIN authentication (`.env`) and strict Command Whitelisting (no shell injection possible).
 * ⚙️ **Dynamic Management**: Add, edit, or delete your custom commands directly from the web interface.
 * 🌍 **Universal**: Works natively on Ubuntu, Debian, Raspberry Pi OS, Fedora, and any systemd-based Linux distribution.
+* 🔄 **Built-in Lifecycle**: Includes automated installation, uninstallation, and update scripts.
 
 ## 🚀 Installation
 
@@ -60,3 +65,6 @@ This will cleanly stop and disable the systemd service, remove the service file,
 Lucius is designed to run in your **Local Area Network (LAN)**. 
 * Access is protected by the `LUCIUS_PIN` defined in the `.env` file.
 * The backend **only** accepts and executes commands defined and saved in the management interface (Whitelist). A user cannot pass and execute arbitrary unregistered commands.
+
+⚠️ **Important Note on `sudo` Commands**: 
+If you add commands that require root privileges (e.g., `sudo systemctl restart nginx`), the tool will hang if the system prompts for a password. You **must** configure your `/etc/sudoers` file to allow the user running Lucius to execute those specific commands without a password prompt (`NOPASSWD`).
