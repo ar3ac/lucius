@@ -142,6 +142,14 @@ lucius/
 
 ---
 
+## ☕ Support
+
+If you find Lucius useful and want to support its development, feel free to buy me a coffee!
+
+[![Donate via PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge&logo=paypal)](https://py.pl/WNQOC0WPuLs2xdEitk4Anw)
+
+---
+
 ## 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you'd like to change.
