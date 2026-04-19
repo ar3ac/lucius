@@ -5,7 +5,7 @@
 <details>
   <summary>🎥 <b>Click here to view the Demo Video</b></summary>
   <br>
-  <img src="assets/demo.webp" width="100%" style="max-width: 600px; border-radius: 8px; border: 1px solid #e2e8f0;">
+  <img src="assets/demo.gif" width="100%" style="max-width: 500px; border-radius: 8px; border: 1px solid #e2e8f0;">
 </details>
 
 ## 🛠️ Tech Stack
