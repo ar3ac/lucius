@@ -5,8 +5,26 @@
     --text-main: #111827;
     --text-muted: #6b7280;
     --border-color: #e5e7eb;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --terminal-bg: #1e1e1e;
+    --terminal-text: #10b981;
     --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #0f172a;
+        --card-bg: #1e293b;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --accent-color: #6366f1;
+        --accent-hover: #818cf8;
+        --terminal-bg: #000000;
+        --terminal-text: #34d399;
+    }
 }
 
 body {
@@ -104,39 +122,47 @@ h1, h2, h3 {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     white-space: nowrap;
 }
 
 .command-btn:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
+    background-color: var(--bg-color);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .command-btn:active {
-    background-color: #f3f4f6;
+    transform: scale(0.97);
 }
 
 .command-btn i {
     color: var(--text-muted);
+    transition: color 0.2s;
+}
+
+.command-btn:hover i {
+    color: var(--accent-color);
 }
 
 .output {
-    background-color: var(--card-bg);
+    background-color: var(--terminal-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 1.25rem;
     margin-top: 2rem;
     min-height: 150px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02) inset;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) inset;
+    overflow-x: auto;
 }
 
 .output pre {
     margin: 0;
     font-family: var(--font-mono);
     font-size: 0.875rem;
-    color: var(--text-main);
+    color: var(--terminal-text);
     line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -231,27 +257,30 @@ h1, h2, h3 {
     font-family: var(--font-mono);
     font-size: 0.875rem;
     color: var(--text-main);
-    background-color: #f9fafb;
+    background-color: var(--bg-color);
+    transition: all 0.2s;
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: var(--text-muted);
-    background-color: white;
+    border-color: var(--accent-color);
+    background-color: var(--card-bg);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 .primary-btn {
-    background-color: var(--text-main);
+    background-color: var(--accent-color);
     color: white;
     border: none;
     align-self: flex-start;
 }
 
 .primary-btn:hover {
-    background-color: #374151;
+    background-color: var(--accent-hover);
+    color: white;
 }
 
-.primary-btn i {
+.primary-btn i, .primary-btn:hover i {
     color: white;
 }
 
