@@ -1,15 +1,24 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pathlib import Path
-import subprocess, json
-import asyncio
+from dotenv import load_dotenv
+import subprocess, json, re, os
 
+load_dotenv()
+LUCIUS_PIN = os.getenv("LUCIUS_PIN", "1234")
 
 app = FastAPI()
-# app.mount("/static", StaticFiles(directory="static"), name="static")
-# templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+
+@app.exception_handler(401)
+async def custom_401_handler(request: Request, exc: HTTPException):
+    return RedirectResponse(url="/login", status_code=303)
+
+def check_auth(request: Request):
+    if request.cookies.get("lucius_auth") != "ok":
+        raise HTTPException(status_code=401)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
@@ -26,18 +35,64 @@ def save_commands(commands):
         json.dump(commands, f, indent=4)
 
 
+@app.get("/login")
+def login_get(request: Request):
+    return templates.TemplateResponse(request=request, name="login.html")
+
+@app.post("/login")
+def login_post(request: Request, response: Response, pin: str = Form(...)):
+    if pin == LUCIUS_PIN:
+        redirect = RedirectResponse(url="/", status_code=303)
+        redirect.set_cookie(key="lucius_auth", value="ok", httponly=True, max_age=86400*30) # Scade in 30 giorni
+        return redirect
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": "PIN non corretto"})
+
+@app.get("/logout")
+def logout():
+    redirect = RedirectResponse(url="/login", status_code=303)
+    redirect.delete_cookie("lucius_auth")
+    return redirect
+
+
 @app.get("/")
-def index(request: Request):
+def index(request: Request, _ = Depends(check_auth)):
     commands = load_commands()  # Load commands from JSON file
     return templates.TemplateResponse(
         request=request, name="index.html", context={"commands": commands}
     )
 
 
+@app.get("/manage")
+def manage(request: Request, _ = Depends(check_auth)):
+    commands = load_commands()
+    return templates.TemplateResponse(
+        request=request, name="manage.html", context={"commands": commands}
+    )
+
+
 @app.post("/run")
-def run_command(request: Request, command: str = Form(...)):
-    cmd_list = command.split()
+def run_command(request: Request, command: str = Form(...), _ = Depends(check_auth)):
+    commands_dict = load_commands()
+    
+    # 1. Sicurezza: controlliamo che la chiave esista in commands.json
+    if command not in commands_dict:
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context={
+                "output": None,
+                "error": "Errore di sicurezza: comando non autorizzato.",
+                "commands": commands_dict,
+            },
+        )
+        
+    # 2. Otteniamo la stringa del comando vera e propria e facciamo lo split
+    actual_cmd_string = commands_dict[command]
+    cmd_list = actual_cmd_string.split()
     print(f"Running command: {cmd_list}")
+    
+    output = None
+    error = None
     try:
         result = subprocess.run(
             cmd_list,
@@ -51,12 +106,98 @@ def run_command(request: Request, command: str = Form(...)):
     except subprocess.CalledProcessError as e:
         output = e.stdout
         error = e.stderr
+    except FileNotFoundError:
+        # Gestiamo il caso in cui l'eseguibile (es. 'uptime') non sia presente nel sistema
+        error = f"Errore: Eseguibile non trovato per '{cmd_list[0]}'"
+        
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "output": output,
-            "error": error if "error" in locals() else None,
-            "commands": load_commands(),
+            "error": error,
+            "commands": commands_dict,
         },
     )
+
+@app.post("/add")
+def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _ = Depends(check_auth)):
+    name = name.strip()
+    cmd = cmd.strip()
+    
+    # 1. Valida nome: niente spazi, solo alfanumerici e underscore
+    if not re.match(r"^[a-zA-Z0-9_]+$", name):
+        return templates.TemplateResponse(
+            request=request,
+            name="manage.html",
+            context={
+                "commands": load_commands(),
+                "error": "Errore: Il nome può contenere solo lettere, numeri e underscore."
+            }
+        )
+        
+    commands = load_commands()
+    
+    # 2. Valida nome: non deve già esistere
+    if name in commands:
+        return templates.TemplateResponse(
+            request=request,
+            name="manage.html",
+            context={
+                "commands": commands,
+                "error": f"Errore: Esiste già un comando chiamato '{name}'."
+            }
+        )
+        
+    # Salva nuovo comando
+    commands[name] = cmd
+    save_commands(commands)
+    
+    # Redirect GET a /manage per ricaricare la pagina
+    return RedirectResponse(url="/manage", status_code=303)
+
+
+@app.post("/delete")
+def delete_command(request: Request, name: str = Form(...), _ = Depends(check_auth)):
+    commands = load_commands()
+    if name in commands:
+        del commands[name]
+        save_commands(commands)
+        
+    return RedirectResponse(url="/manage", status_code=303)
+
+
+@app.post("/edit")
+def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), old_name: str = Form(...), _ = Depends(check_auth)):
+    name = name.strip()
+    cmd = cmd.strip()
+    
+    if not re.match(r"^[a-zA-Z0-9_]+$", name):
+        return templates.TemplateResponse(
+            request=request, name="manage.html", context={
+                "commands": load_commands(), "error": "Errore: Il nome può contenere solo lettere, numeri e underscore."
+            }
+        )
+        
+    commands = load_commands()
+    
+    if old_name not in commands:
+         return RedirectResponse(url="/manage", status_code=303)
+         
+    if name != old_name and name in commands:
+        return templates.TemplateResponse(
+            request=request, name="manage.html", context={
+                "commands": commands, "error": f"Errore: Esiste già un comando chiamato '{name}'."
+            }
+        )
+        
+    del commands[old_name]
+    commands[name] = cmd
+    save_commands(commands)
+    
+    return RedirectResponse(url="/manage", status_code=303)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

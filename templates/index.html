@@ -1,28 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Command Runner</title>
-</head>
-<body>
-    <h1>Command Runner</h1>
+{% extends "base.html" %}
+{% block title %}
+    <title>lucius</title>
+{% endblock %}
+{% block content %}
+    <header class="top-bar">
+        <h1><i class="fas fa-terminal"> </i>        lucius</h1>
+        <div style="display: flex; gap: 0.5rem;">
+            <a class="manage-link" href="/manage"><i class="fas fa-cog"></i> Manage commands</a>
+            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Esci</a>
+        </div>
+    </header>
+    <br>
     {% for command, command_params in commands.items() %}
     <div class="command">
     <form action="/run" method="post">
         <input type="hidden" name="command" value="{{ command }}">
-        <button type="submit">{{ command }}</button>
+        <button type="submit" class="command-btn"><i class="fas fa-play"></i> {{ command }}</button>
         <p>{{ command_params }}</p>
     </form>
     </div>
     {% endfor %}
-    {% if output %}
     <div class="output">
-        {{ output }}
+        {% if output %}
+            <pre>{{ output }}</pre>
+        {% elif error %}
+            <pre class="error">{{ error }}</pre>
+        {% else %}
+            <em>Nessun comando eseguito ancora.</em>
+        {% endif %}
     </div>
-    {% endif %}
-</body>
-</html>
-    </div>
-    {% endif %}
-</body>
-</html>
+{% endblock %}
