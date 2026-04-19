@@ -7,26 +7,33 @@
         <h1><i class="fas fa-terminal"> </i>        lucius</h1>
         <div style="display: flex; gap: 0.5rem;">
             <a class="manage-link" href="/manage"><i class="fas fa-cog"></i> Manage commands</a>
-            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Esci</a>
+            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
     <br>
     {% for command, command_params in commands.items() %}
-    <div class="command">
-    <form action="/run" method="post">
-        <input type="hidden" name="command" value="{{ command }}">
-        <button type="submit" class="command-btn"><i class="fas fa-play"></i> {{ command }}</button>
-        <p>{{ command_params }}</p>
-    </form>
-    </div>
+        <form action="/run" method="post" style="display: inline-block;">
+            <input type="hidden" name="command" value="{{ command }}">
+            <button type="submit" class="command-btn"><i class="fas fa-terminal"></i> {{ command }}</button>
+        </form>
+    {% else %}
+        <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">No commands configured. Go to manage to add some.</p>
     {% endfor %}
-    <div class="output">
-        {% if output %}
-            <pre>{{ output }}</pre>
-        {% elif error %}
-            <pre class="error">{{ error }}</pre>
-        {% else %}
-            <em>Nessun comando eseguito ancora.</em>
-        {% endif %}
-    </div>
+    </section>
+
+    {% if output or error %}
+    <section class="output-panel">
+        <h2 class="section-title">Command Output</h2>
+        <div class="output">
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+            {% if output %}
+                <pre>{{ output }}</pre>
+            {% elif not error %}
+                <pre style="color: var(--text-muted);">No output.</pre>
+            {% endif %}
+        </div>
+    </section>
+    {% endif %}
 {% endblock %}

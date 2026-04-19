@@ -4,34 +4,34 @@
 {% endblock %}
 {% block content %}
     <header class="top-bar">
-        <h1><i class="fas fa-cogs"></i> Gestione comandi</h1>
+        <h1><i class="fas fa-cogs"></i> Command Management</h1>
         <div style="display: flex; gap: 0.5rem;">
-            <a class="manage-link" href="/"><i class="fas fa-home"></i> Torna a lucius</a>
-            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Esci</a>
+            <a class="manage-link" href="/"><i class="fas fa-home"></i> Back to lucius</a>
+            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
     <section class="manage-panel">
         {% if error %}
             <div class="output" style="margin-top:0; margin-bottom:1.5rem;"><p class="error" style="margin:0;">{{ error }}</p></div>
         {% endif %}
-        <h2 class="section-title" id="form-title">Aggiungi Comando</h2>
+        <h2 class="section-title" id="form-title">Add Command</h2>
         <form action="/add" method="post" class="add-form" id="command-form">
             <input type="hidden" id="old_name" name="old_name" value="">
             <div class="form-group">
-                <label for="name">Nome (es. riavvia_wifi)</label>
-                <input type="text" id="name" name="name" required placeholder="Senza spazi, es. restart_net">
+                <label for="name">Name (e.g. restart_wifi)</label>
+                <input type="text" id="name" name="name" required placeholder="No spaces, e.g. restart_net">
             </div>
             <div class="form-group">
-                <label for="cmd">Comando Shell</label>
-                <input type="text" id="cmd" name="cmd" required placeholder="es. sudo systemctl restart network">
+                <label for="cmd">Shell Command</label>
+                <input type="text" id="cmd" name="cmd" required placeholder="e.g. sudo systemctl restart network">
             </div>
             <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="command-btn primary-btn" id="submit-btn"><i class="fas fa-plus"></i> Aggiungi</button>
-                <button type="button" class="command-btn" id="cancel-btn" style="display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer;" onclick="resetForm()">Annulla</button>
+                <button type="submit" class="command-btn primary-btn" id="submit-btn"><i class="fas fa-plus"></i> Add</button>
+                <button type="button" class="command-btn" id="cancel-btn" style="display: none; background-color: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer;" onclick="resetForm()">Cancel</button>
             </div>
         </form>
 
-        <h2 class="section-title">Comandi Esistenti</h2>
+        <h2 class="section-title">Existing Commands</h2>
         <ul>
             {% for command, params in commands.items() %}
             <li>
@@ -39,38 +39,38 @@
                     <strong>{{ command }}</strong> <span class="cmd-text">{{ params }}</span>
                 </div>
                 <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0;">
-                    <button type="button" class="edit-btn" title="Modifica" onclick="editCommand('{{ command }}', '{{ params|replace('\'', '\\\'') }}')"><i class="fas fa-edit"></i></button>
-                    <form action="/delete" method="post" class="delete-form" onsubmit="return confirm('Sicuro di eliminare questo comando?');">
+                    <button type="button" class="edit-btn" title="Edit" onclick="editCommand('{{ command }}', '{{ params|replace('\'', '\\\'') }}')"><i class="fas fa-edit"></i></button>
+                    <form action="/delete" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this command?');">
                         <input type="hidden" name="name" value="{{ command }}">
-                        <button type="submit" class="delete-btn" title="Elimina"><i class="fas fa-trash"></i></button>
+                        <button type="submit" class="delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
                     </form>
                 </div>
             </li>
             {% else %}
-            <li>Nessun comando salvato.</li>
+            <li>No commands saved.</li>
             {% endfor %}
         </ul>
     </section>
 
 <script>
 function editCommand(name, cmd) {
-    document.getElementById('form-title').innerText = 'Modifica Comando';
+    document.getElementById('form-title').innerText = 'Edit Command';
     document.getElementById('command-form').action = '/edit';
     document.getElementById('old_name').value = name;
     document.getElementById('name').value = name;
     document.getElementById('cmd').value = cmd;
-    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Salva';
+    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-save"></i> Save';
     document.getElementById('cancel-btn').style.display = 'block';
     document.getElementById('name').focus();
     window.scrollTo(0, 0);
 }
 function resetForm() {
-    document.getElementById('form-title').innerText = 'Aggiungi Comando';
+    document.getElementById('form-title').innerText = 'Add Command';
     document.getElementById('command-form').action = '/add';
     document.getElementById('old_name').value = '';
     document.getElementById('name').value = '';
     document.getElementById('cmd').value = '';
-    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-plus"></i> Aggiungi';
+    document.getElementById('submit-btn').innerHTML = '<i class="fas fa-plus"></i> Add';
     document.getElementById('cancel-btn').style.display = 'none';
 }
 </script>

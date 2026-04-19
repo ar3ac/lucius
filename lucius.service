@@ -3,11 +3,11 @@ Description=Lucius (PiCmdHub) Web App
 After=network.target
 
 [Service]
-# SOSTITUIRE: Il nome utente che eseguira' il tool (es. pi, ubuntu, ar3ac)
+# REPLACE: The username that will run the tool (e.g. pi, ubuntu, ar3ac)
 User=pi
-# SOSTITUIRE: Il percorso assoluto dove si trova la cartella del progetto
+# REPLACE: The absolute path where the project folder is located
 WorkingDirectory=/home/pi/lucius
-# L'eseguibile uvicorn all'interno del virtualenv (.venv)
+# The uvicorn executable inside the virtualenv (.venv)
 ExecStart=/home/pi/lucius/.venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000
 Restart=always
 RestartSec=3

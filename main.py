@@ -43,9 +43,9 @@ def login_get(request: Request):
 def login_post(request: Request, response: Response, pin: str = Form(...)):
     if pin == LUCIUS_PIN:
         redirect = RedirectResponse(url="/", status_code=303)
-        redirect.set_cookie(key="lucius_auth", value="ok", httponly=True, max_age=86400*30) # Scade in 30 giorni
+        redirect.set_cookie(key="lucius_auth", value="ok", httponly=True, max_age=86400*30) # Expires in 30 days
         return redirect
-    return templates.TemplateResponse(request=request, name="login.html", context={"error": "PIN non corretto"})
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": "Incorrect PIN"})
 
 @app.get("/logout")
 def logout():
@@ -74,19 +74,19 @@ def manage(request: Request, _ = Depends(check_auth)):
 def run_command(request: Request, command: str = Form(...), _ = Depends(check_auth)):
     commands_dict = load_commands()
     
-    # 1. Sicurezza: controlliamo che la chiave esista in commands.json
+    # 1. Security: check if the key exists in commands.json
     if command not in commands_dict:
         return templates.TemplateResponse(
             request=request,
             name="index.html",
             context={
                 "output": None,
-                "error": "Errore di sicurezza: comando non autorizzato.",
+                "error": "Security Error: Unauthorized command.",
                 "commands": commands_dict,
             },
         )
         
-    # 2. Otteniamo la stringa del comando vera e propria e facciamo lo split
+    # 2. Get the actual command string and split it
     actual_cmd_string = commands_dict[command]
     cmd_list = actual_cmd_string.split()
     print(f"Running command: {cmd_list}")
@@ -107,8 +107,8 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
         output = e.stdout
         error = e.stderr
     except FileNotFoundError:
-        # Gestiamo il caso in cui l'eseguibile (es. 'uptime') non sia presente nel sistema
-        error = f"Errore: Eseguibile non trovato per '{cmd_list[0]}'"
+        # Handle the case where the executable (e.g., 'uptime') is not found in the system
+        error = f"Error: Executable not found for '{cmd_list[0]}'"
         
     return templates.TemplateResponse(
         request=request,
@@ -125,35 +125,35 @@ def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _
     name = name.strip()
     cmd = cmd.strip()
     
-    # 1. Valida nome: niente spazi, solo alfanumerici e underscore
+    # 1. Validate name: no spaces, only alphanumerics and underscores
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
             request=request,
             name="manage.html",
             context={
                 "commands": load_commands(),
-                "error": "Errore: Il nome può contenere solo lettere, numeri e underscore."
+                "error": "Error: Name can only contain letters, numbers, and underscores."
             }
         )
         
     commands = load_commands()
     
-    # 2. Valida nome: non deve già esistere
+    # 2. Validate name: must not already exist
     if name in commands:
         return templates.TemplateResponse(
             request=request,
             name="manage.html",
             context={
                 "commands": commands,
-                "error": f"Errore: Esiste già un comando chiamato '{name}'."
+                "error": f"Error: A command named '{name}' already exists."
             }
         )
         
-    # Salva nuovo comando
+    # Save new command
     commands[name] = cmd
     save_commands(commands)
     
-    # Redirect GET a /manage per ricaricare la pagina
+    # GET Redirect to /manage to reload the page
     return RedirectResponse(url="/manage", status_code=303)
 
 
@@ -175,7 +175,7 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
             request=request, name="manage.html", context={
-                "commands": load_commands(), "error": "Errore: Il nome può contenere solo lettere, numeri e underscore."
+                "commands": load_commands(), "error": "Error: Name can only contain letters, numbers, and underscores."
             }
         )
         
@@ -187,7 +187,7 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
     if name != old_name and name in commands:
         return templates.TemplateResponse(
             request=request, name="manage.html", context={
-                "commands": commands, "error": f"Errore: Esiste già un comando chiamato '{name}'."
+                "commands": commands, "error": f"Error: A command named '{name}' already exists."
             }
         )
         

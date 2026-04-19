@@ -5,8 +5,8 @@
 {% block content %}
     <div style="display: flex; justify-content: center; align-items: center; min-height: 50vh;">
         <div class="manage-panel" style="width: 100%; max-width: 400px;">
-            <h2 class="section-title" style="text-align: center; border: none; margin-bottom: 0.5rem;"><i class="fas fa-lock" style="color: var(--text-muted);"></i> Accesso Protetto</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">Inserisci il tuo LUCIUS_PIN per continuare</p>
+            <h2 class="section-title" style="text-align: center; border: none; margin-bottom: 0.5rem;"><i class="fas fa-lock" style="color: var(--text-muted);"></i> Protected Access</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 1.5rem;">Enter your LUCIUS_PIN to continue</p>
             
             {% if error %}
                 <div class="output" style="margin-top:0; margin-bottom:1.5rem; padding: 0.75rem;"><p class="error" style="margin:0; text-align:center;">{{ error }}</p></div>
@@ -16,7 +16,7 @@
                 <div class="form-group">
                     <input type="password" id="pin" name="pin" required placeholder="PIN" autofocus style="text-align: center; font-size: 1.25rem; letter-spacing: 0.5rem; padding: 1rem;">
                 </div>
-                <button type="submit" class="command-btn primary-btn" style="width: 100%; justify-content: center; padding: 0.75rem;"><i class="fas fa-sign-in-alt"></i> Accedi</button>
+                <button type="submit" class="command-btn primary-btn" style="width: 100%; justify-content: center; padding: 0.75rem;"><i class="fas fa-sign-in-alt"></i> Login</button>
             </form>
         </div>
     </div>
