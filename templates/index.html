@@ -14,28 +14,66 @@
         </div>
     </header>
     
-    <main style="display: flex; flex-direction: column; width: 100%; margin: auto 0;">
-    <section class="manage-panel" style="border: none; background: transparent; box-shadow: none; padding: 0; margin-top: auto;">
-        <h2 class="section-title" style="border: none; padding-bottom: 0;">Select a command to execute:</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+    <main style="display: flex; flex-direction: column; width: 100%; margin: 1rem 0;">
+    <section class="command-grid-section">
+        <h2 class="section-title">Commands</h2>
+        <div class="command-grid">
         {% for command, command_params in commands.items() %}
-            <form action="/run#output-section" method="post" style="margin: 0; height: 100%;">
+            {% set cmd_lower = (command ~ ' ' ~ command_params).lower() %}
+            {% if 'shutdown' in cmd_lower or 'poweroff' in cmd_lower or 'spegni' in cmd_lower %}
+                {% set icon_class = 'fa-power-off' %}
+                {% set btn_theme = 'theme-danger' %}
+            {% elif 'reboot' in cmd_lower or 'restart' in cmd_lower or 'riavvia' in cmd_lower %}
+                {% set icon_class = 'fa-sync-alt' %}
+                {% set btn_theme = 'theme-warning' %}
+            {% elif 'mem' in cmd_lower or 'ram' in cmd_lower %}
+                {% set icon_class = 'fa-memory' %}
+                {% set btn_theme = 'theme-purple' %}
+            {% elif 'cpu' in cmd_lower or 'temp' in cmd_lower or 'load' in cmd_lower %}
+                {% set icon_class = 'fa-microchip' %}
+                {% set btn_theme = 'theme-blue' %}
+            {% elif 'disk' in cmd_lower or 'space' in cmd_lower or 'storage' in cmd_lower or 'df' in cmd_lower or 'hdd' in cmd_lower %}
+                {% set icon_class = 'fa-hdd' %}
+                {% set btn_theme = 'theme-teal' %}
+            {% elif 'uptime' in cmd_lower or 'time' in cmd_lower %}
+                {% set icon_class = 'fa-clock' %}
+                {% set btn_theme = 'theme-emerald' %}
+            {% elif 'net' in cmd_lower or 'ip' in cmd_lower or 'wifi' in cmd_lower or 'vpn' in cmd_lower %}
+                {% set icon_class = 'fa-network-wired' %}
+                {% set btn_theme = 'theme-cyan' %}
+            {% elif 'docker' in cmd_lower or 'container' in cmd_lower %}
+                {% set icon_class = 'fa-cubes' %}
+                {% set btn_theme = 'theme-blue' %}
+            {% else %}
+                {% set icon_class = 'fa-terminal' %}
+                {% set btn_theme = 'theme-primary' %}
+            {% endif %}
+
+            <form action="/run#output-section" method="post" class="command-form" onsubmit="handleCommandSubmit(this)">
                 <input type="hidden" name="command" value="{{ command }}">
-                <button type="submit" class="command-btn" style="width: 100%; height: 100%; min-height: 100px; justify-content: center; flex-direction: column; gap: 0.75rem; font-size: 1rem; border-radius: 0.75rem;">
-                    <i class="fas fa-bolt" style="font-size: 1.5rem;"></i> 
-                    {{ command }}
+                <button type="submit" class="command-card {{ btn_theme }}">
+                    <div class="command-icon-box">
+                        <i class="fas {{ icon_class }}"></i>
+                    </div>
+                    <div class="command-info">
+                        <span class="command-name">{{ command }}</span>
+                        <code class="command-cmd">{{ command_params }}</code>
+                    </div>
+                    <div class="command-action">
+                        <i class="fas fa-play"></i>
+                    </div>
                 </button>
             </form>
         {% else %}
-            <p style="color: var(--text-muted); text-align: center; grid-column: 1 / -1; margin-top: 2rem;">No commands configured. Go to manage to add some.</p>
+            <p style="color: var(--text-muted); text-align: center; grid-column: 1 / -1; margin-top: 2rem; font-size: 1.1rem;">No commands configured. Go to manage to add some.</p>
         {% endfor %}
         </div>
     </section>
     </main>
 
     {% if output or error %}
-    <section id="output-section" style="margin-top: 3rem;">
-        <h2 class="section-title">Command Output</h2>
+    <section id="output-section" style="margin-top: 2.5rem;">
+        <h2 class="section-title"><i class="fas fa-terminal"></i> Command Output</h2>
         <div class="output">
             {% if error %}
                 <p class="error">{{ error }}</p>
@@ -48,4 +86,17 @@
         </div>
     </section>
     {% endif %}
+
+    <script>
+    function handleCommandSubmit(form) {
+        const btn = form.querySelector('.command-card');
+        const actionIcon = form.querySelector('.command-action i');
+        if (btn) {
+            btn.classList.add('is-running');
+            if (actionIcon) {
+                actionIcon.className = 'fas fa-spinner fa-spin';
+            }
+        }
+    }
+    </script>
 {% endblock %}

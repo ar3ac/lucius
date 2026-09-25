@@ -69,14 +69,28 @@ h1, h2, h3 {
     color: var(--text-muted);
 }
 
+.server-badge {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--border-color);
+    padding: 0.2rem 0.65rem;
+    border-radius: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
 .top-bar a {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.375rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.5rem 0.85rem;
+    border-radius: 0.5rem;
     transition: all 0.2s;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
 }
 
 .top-bar a:hover {
@@ -84,45 +98,204 @@ h1, h2, h3 {
     color: var(--text-main);
 }
 
-.command {
+.top-bar .logout-link {
+    color: #ef4444;
+}
+
+.top-bar .logout-link:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border-color: #ef4444;
+}
+
+/* Command Big Buttons & Grid */
+.command-grid-section {
+    width: 100%;
+}
+
+.command-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+@media (max-width: 640px) {
+    .command-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+.command-form {
+    margin: 0;
+    width: 100%;
+}
+
+.command-card {
+    width: 100%;
+    min-height: 112px;
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
-    transition: box-shadow 0.2s, border-color 0.2s;
+    border: 2px solid var(--border-color);
+    border-radius: 1.15rem;
+    padding: 1.25rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    box-sizing: border-box;
 }
 
-.command:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border-color: #d1d5db;
+.command-card:hover {
+    border-color: var(--card-accent, var(--accent-color));
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08);
 }
 
-.command form {
+.command-card:active {
+    transform: scale(0.97);
+}
+
+.command-card.is-running {
+    opacity: 0.85;
+    pointer-events: none;
+    border-color: var(--accent-color);
+}
+
+.command-icon-box {
+    width: 62px;
+    height: 62px;
+    min-width: 62px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.85rem;
+    background: var(--icon-bg, rgba(99, 102, 241, 0.12));
+    color: var(--icon-color, var(--accent-color));
+    transition: all 0.2s;
+}
+
+.command-card:hover .command-icon-box {
+    transform: scale(1.06);
+}
+
+.command-info {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+    flex-grow: 1;
+    gap: 0.35rem;
+    overflow: hidden;
 }
 
-.command p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 0.875rem;
+.command-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    word-break: break-word;
+}
+
+.command-cmd {
     font-family: var(--font-mono);
-    text-align: left;
-    word-break: break-all;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: var(--bg-color);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.command-action {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.command-card:hover .command-action {
+    background: var(--card-accent, var(--accent-color));
+    color: #ffffff;
+    border-color: transparent;
+    transform: scale(1.1);
+}
+
+/* Color Themes for Immediate Visual Recognition */
+.theme-danger {
+    --card-accent: #ef4444;
+    --icon-bg: rgba(239, 68, 68, 0.15);
+    --icon-color: #ef4444;
+}
+
+.theme-warning {
+    --card-accent: #f59e0b;
+    --icon-bg: rgba(245, 158, 11, 0.15);
+    --icon-color: #f59e0b;
+}
+
+.theme-purple {
+    --card-accent: #a855f7;
+    --icon-bg: rgba(168, 85, 247, 0.15);
+    --icon-color: #a855f7;
+}
+
+.theme-blue {
+    --card-accent: #3b82f6;
+    --icon-bg: rgba(59, 130, 246, 0.15);
+    --icon-color: #3b82f6;
+}
+
+.theme-teal {
+    --card-accent: #14b8a6;
+    --icon-bg: rgba(20, 184, 166, 0.15);
+    --icon-color: #14b8a6;
+}
+
+.theme-emerald {
+    --card-accent: #10b981;
+    --icon-bg: rgba(16, 185, 129, 0.15);
+    --icon-color: #10b981;
+}
+
+.theme-cyan {
+    --card-accent: #06b6d4;
+    --icon-bg: rgba(6, 182, 212, 0.15);
+    --icon-color: #06b6d4;
+}
+
+.theme-primary {
+    --card-accent: var(--accent-color);
+    --icon-bg: rgba(99, 102, 241, 0.15);
+    --icon-color: var(--accent-color);
 }
 
 .command-btn {
     background-color: var(--card-bg);
     color: var(--text-main);
     border: 1px solid var(--border-color);
-    border-radius: 0.375rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border-radius: 0.5rem;
+    padding: 0.65rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -154,23 +327,24 @@ h1, h2, h3 {
 
 .output {
     background-color: var(--terminal-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    padding: 1.25rem;
+    border: 2px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
     margin-top: 2rem;
     min-height: 150px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2) inset;
     overflow-x: auto;
 }
 
 .output pre {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--terminal-text);
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-weight: 500;
 }
 
 .output .error {
