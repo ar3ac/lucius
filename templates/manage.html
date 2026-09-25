@@ -49,15 +49,40 @@
             </div>
         </form>
 
-        <h2 class="section-title">Existing Commands</h2>
-        <ul>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 2rem; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2 class="section-title" style="margin: 0; border: none; padding: 0;">Existing Commands</h2>
+            <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-arrows-alt-v"></i> Drag handle or use arrows to reorder</span>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 1.25rem;">
+
+        <ul id="command-list" class="command-manage-list">
             {% for command, params in commands.items() %}
-            <li>
-                <div class="cmd-info">
-                    <strong>{{ command }}</strong> <span class="cmd-text">{{ params }}</span>
+            <li class="draggable-cmd" id="cmd-{{ command }}" data-command="{{ command }}">
+                <div class="cmd-lead">
+                    <span class="drag-handle" title="Drag to reorder" draggable="true"><i class="fas fa-grip-vertical"></i></span>
+                    <div class="cmd-info">
+                        <strong>{{ command }}</strong>
+                        <span class="cmd-text">{{ params }}</span>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 0.5rem; align-items: center; margin: 0;">
-                    <button type="button" class="edit-btn" title="Edit" onclick="editCommand('{{ command }}', '{{ params|replace('\'', '\\\'') }}')"><i class="fas fa-edit"></i></button>
+                <div class="cmd-actions">
+                    <form action="/reorder" method="post" class="reorder-form" onsubmit="event.preventDefault(); moveCommand(this, 'up');">
+                        <input type="hidden" name="name" value="{{ command }}">
+                        <input type="hidden" name="direction" value="up">
+                        <button type="submit" class="order-btn btn-move-up" title="Move Up" {% if loop.first %}disabled{% endif %}>
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                    </form>
+                    <form action="/reorder" method="post" class="reorder-form" onsubmit="event.preventDefault(); moveCommand(this, 'down');">
+                        <input type="hidden" name="name" value="{{ command }}">
+                        <input type="hidden" name="direction" value="down">
+                        <button type="submit" class="order-btn btn-move-down" title="Move Down" {% if loop.last %}disabled{% endif %}>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </form>
+                    <button type="button" class="edit-btn" title="Edit" onclick="editCommand('{{ command }}', '{{ params|replace('\'', '\\\'') }}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
                     <form action="/delete" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this command?');">
                         <input type="hidden" name="name" value="{{ command }}">
                         <button type="submit" class="delete-btn" title="Delete"><i class="fas fa-trash"></i></button>
@@ -91,5 +116,87 @@ function resetForm() {
     document.getElementById('submit-btn').innerHTML = '<i class="fas fa-plus"></i> Add';
     document.getElementById('cancel-btn').style.display = 'none';
 }
+
+function updateButtonStates() {
+    const list = document.getElementById('command-list');
+    if (!list) return;
+    const items = list.querySelectorAll('li.draggable-cmd');
+    items.forEach((item, index) => {
+        const upBtn = item.querySelector('.btn-move-up');
+        const downBtn = item.querySelector('.btn-move-down');
+        if (upBtn) upBtn.disabled = (index === 0);
+        if (downBtn) downBtn.disabled = (index === items.length - 1);
+    });
+}
+
+async function saveNewOrder() {
+    const list = document.getElementById('command-list');
+    if (!list) return;
+    const items = list.querySelectorAll('li.draggable-cmd');
+    const order = Array.from(items).map(item => item.dataset.command);
+    try {
+        await fetch('/reorder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order })
+        });
+    } catch (err) {
+        console.error('Error saving order:', err);
+    }
+}
+
+function moveCommand(sourceEl, direction) {
+    const li = sourceEl.closest('li.draggable-cmd');
+    if (!li) return;
+    if (direction === 'up' && li.previousElementSibling) {
+        li.parentNode.insertBefore(li, li.previousElementSibling);
+        updateButtonStates();
+        saveNewOrder();
+    } else if (direction === 'down' && li.nextElementSibling) {
+        li.parentNode.insertBefore(li.nextElementSibling, li);
+        updateButtonStates();
+        saveNewOrder();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('command-list');
+    if (!list) return;
+    
+    let draggedItem = null;
+    const items = list.querySelectorAll('li.draggable-cmd');
+    
+    items.forEach(item => {
+        const handle = item.querySelector('.drag-handle');
+        if (handle) {
+            handle.addEventListener('dragstart', (e) => {
+                draggedItem = item;
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', item.dataset.command);
+            });
+            handle.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+                draggedItem = null;
+                updateButtonStates();
+                saveNewOrder();
+            });
+        }
+        
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            if (!draggedItem || draggedItem === item) return;
+            
+            const rect = item.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            if (e.clientY < midpoint) {
+                list.insertBefore(draggedItem, item);
+            } else {
+                list.insertBefore(draggedItem, item.nextSibling);
+            }
+        });
+    });
+});
 </script>
 {% endblock %}

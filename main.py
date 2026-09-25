@@ -245,11 +245,60 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
             }
         )
         
-    del commands[old_name]
-    commands[name] = cmd
-    save_commands(commands)
+    # Preserve key order while replacing old_name with name
+    new_commands = {}
+    for k, v in commands.items():
+        if k == old_name:
+            new_commands[name] = cmd
+        else:
+            new_commands[k] = v
+    save_commands(new_commands)
     
     return RedirectResponse(url="/manage", status_code=303)
+
+
+@app.post("/reorder")
+async def reorder_commands(request: Request, _ = Depends(check_auth)):
+    content_type = request.headers.get("content-type", "")
+    commands = load_commands()
+    keys = list(commands.keys())
+    
+    # Drag-and-drop JSON payload
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+            new_order = data.get("order", [])
+            if isinstance(new_order, list) and new_order:
+                reordered = {}
+                for k in new_order:
+                    if k in commands:
+                        reordered[k] = commands[k]
+                for k, v in commands.items():
+                    if k not in reordered:
+                        reordered[k] = v
+                save_commands(reordered)
+                return {"status": "ok"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+        return {"status": "bad_request"}
+        
+    # Standard Form submission (Arrow buttons)
+    form = await request.form()
+    name = form.get("name")
+    direction = form.get("direction")
+    
+    if name in keys:
+        idx = keys.index(name)
+        if direction == "up" and idx > 0:
+            keys[idx], keys[idx - 1] = keys[idx - 1], keys[idx]
+        elif direction == "down" and idx < len(keys) - 1:
+            keys[idx], keys[idx + 1] = keys[idx + 1], keys[idx]
+            
+        reordered = {k: commands[k] for k in keys}
+        save_commands(reordered)
+        
+    return RedirectResponse(url=f"/manage#cmd-{name}", status_code=303)
+
 
 
 if __name__ == "__main__":

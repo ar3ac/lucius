@@ -47,7 +47,8 @@ You have a Raspberry Pi, a home server, or a VPS. You need to restart a service,
 - 📱 **Mobile-First & High Accessibility** — huge thumb-friendly action cards with instant visual recognition (large icons, high-contrast typography, color-coded themes), effortless to tap even without glasses
 - ⚡ **One-tap execution** — no typing, no SSH, no friction
 - 🛡️ **Secure by design** — PIN auth + strict command whitelist (no shell injection possible)
-- ⚙️ **Web-based management** — add, edit, delete commands from the UI, no config files to edit
+- ⚙️ **Web-based management** — add, edit, delete, and reorder commands from the UI, no config files to edit
+- ↕️ **Custom command ordering** — reorder commands via drag-and-drop or one-tap Up/Down arrows to prioritize your most frequent actions
 - 🖥️ **Custom server name** — label each machine so you always know what you're controlling
 - 🌙 **Dark mode** — automatic, follows your system preference
 - 🌍 **Universal Linux support** — Ubuntu, Debian, Raspberry Pi OS, Fedora, Arch and any `systemd`-based distro
