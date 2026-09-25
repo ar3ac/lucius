@@ -23,6 +23,9 @@
             {% if 'shutdown' in cmd_lower or 'poweroff' in cmd_lower or 'spegni' in cmd_lower %}
                 {% set icon_class = 'fa-power-off' %}
                 {% set btn_theme = 'theme-danger' %}
+            {% elif 'suspend' in cmd_lower or 'sospendi' in cmd_lower or 'sleep' in cmd_lower %}
+                {% set icon_class = 'fa-moon' %}
+                {% set btn_theme = 'theme-purple' %}
             {% elif 'reboot' in cmd_lower or 'restart' in cmd_lower or 'riavvia' in cmd_lower %}
                 {% set icon_class = 'fa-sync-alt' %}
                 {% set btn_theme = 'theme-warning' %}

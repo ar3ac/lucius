@@ -36,9 +36,9 @@ You have a Raspberry Pi, a home server, or a VPS. You need to restart a service,
 2. SSH into the machine
 3. Type the command
 
-**With Lucius**, you open your phone, tap a button, done. It's designed to be the *simplest possible tool* for this job — nothing more, nothing less.
+**With Lucius**, you open your phone, tap a button, done. It's designed to be the _simplest possible tool_ for this job — nothing more, nothing less.
 
-> **Not a replacement for Cockpit or Webmin.** Those are powerful full-panel tools. Lucius is for the *20% of tasks you do 80% of the time*, with a UI that feels native on mobile.
+> **Not a replacement for Cockpit or Webmin.** Those are powerful full-panel tools. Lucius is for the _20% of tasks you do 80% of the time_, with a UI that feels native on mobile.
 
 ---
 
@@ -64,6 +64,7 @@ curl -sSL https://raw.githubusercontent.com/ar3ac/lucius/main/install.sh | sudo 
 ```
 
 The script will automatically:
+
 1. Install Python and system dependencies
 2. Clone Lucius into `/opt/lucius`
 3. Ask you to set a secure access PIN
@@ -75,14 +76,15 @@ Then open **`http://<your-server-ip>:8000`** from any device on your network.
 
 ## 💡 Use Cases
 
-| What you want to do | Example command |
-|---|---|
-| Reboot the server | `sudo reboot` |
-| Restart a service | `sudo systemctl restart nginx` |
-| Check available memory | `free -h` |
-| See system uptime | `uptime -p` |
-| Pull latest code | `cd /var/www/myapp && git pull` |
-| Clear system cache | `sudo sync && sudo sysctl -w vm.drop_caches=3` |
+| What you want to do    | Example command                                |
+| ---------------------- | ---------------------------------------------- |
+| Reboot the server      | `sudo reboot`                                  |
+| Restart a service      | `sudo systemctl restart nginx`                 |
+| Check available memory | `free -h`                                      |
+| See system uptime      | `uptime -p`                                    |
+| Pull latest code       | `cd /var/www/myapp && git pull`                |
+| Clear system cache     | `sudo sync && sudo sysctl -w vm.drop_caches=3` |
+| Suspend remote machine | `ssh user@desktop systemctl suspend`           |
 
 ---
 
