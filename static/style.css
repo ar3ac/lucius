@@ -13,6 +13,18 @@
     --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
 }
 
+:root[data-theme="light"] {
+    --bg-color: #f9fafb;
+    --card-bg: #ffffff;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --accent-color: #4f46e5;
+    --accent-hover: #4338ca;
+    --terminal-bg: #1e1e1e;
+    --terminal-text: #10b981;
+}
+
 :root[data-theme="dark"] {
     --bg-color: #0f172a;
     --card-bg: #1e293b;

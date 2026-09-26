@@ -24,18 +24,15 @@
         if (savedTheme) {
             document.documentElement.setAttribute('data-theme', savedTheme);
         }
-        function toggleTheme() {
+        window.toggleTheme = function() {
             const html = document.documentElement;
             const isDark = html.getAttribute('data-theme') === 'dark' || 
                 (!html.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
             const newTheme = isDark ? 'light' : 'dark';
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('lucius-theme', newTheme);
-            const icon = document.getElementById('theme-icon');
-            if (icon) {
-                icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-            }
-        }
+            document.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+        };
     </script>
 
     {% block title %}{% endblock %}
