@@ -3,25 +3,37 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from dotenv import load_dotenv
-import subprocess, json, re, os
+import subprocess, json, re, os, shlex
 
 load_dotenv()
 LUCIUS_PIN = os.getenv("LUCIUS_PIN", "1234")
 
 app = FastAPI()
 
+
 @app.exception_handler(401)
 async def custom_401_handler(request: Request, exc: HTTPException):
     return RedirectResponse(url="/login", status_code=303)
 
+
 def check_auth(request: Request):
     if request.cookies.get("lucius_auth") != "ok":
         raise HTTPException(status_code=401)
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+@app.get("/sw.js")
+def service_worker():
+    return Response(
+        content=open("static/sw.js", "r").read(),
+        media_type="application/javascript"
+    )
+
 
 SETTINGS_FILE = "settings.json"
+
 
 def load_settings():
     if not os.path.exists(SETTINGS_FILE):
@@ -32,6 +44,7 @@ def load_settings():
     except:
         return {"server_name": "Lucius"}
 
+
 def save_settings(settings_dict):
     try:
         with open(SETTINGS_FILE, "w") as f:
@@ -40,6 +53,7 @@ def save_settings(settings_dict):
     except Exception as e:
         print(f"Error saving settings: {e}")
         return False
+
 
 def get_server_name():
     return load_settings().get("server_name", "Lucius")
@@ -62,13 +76,19 @@ def save_commands(commands):
 def login_get(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
+
 @app.post("/login")
 def login_post(request: Request, response: Response, pin: str = Form(...)):
     if pin == LUCIUS_PIN:
         redirect = RedirectResponse(url="/", status_code=303)
-        redirect.set_cookie(key="lucius_auth", value="ok", httponly=True, max_age=86400*30) # Expires in 30 days
+        redirect.set_cookie(
+            key="lucius_auth", value="ok", httponly=True, max_age=86400 * 30
+        )  # Expires in 30 days
         return redirect
-    return templates.TemplateResponse(request=request, name="login.html", context={"error": "Incorrect PIN"})
+    return templates.TemplateResponse(
+        request=request, name="login.html", context={"error": "Incorrect PIN"}
+    )
+
 
 @app.get("/logout")
 def logout():
@@ -78,50 +98,63 @@ def logout():
 
 
 @app.get("/")
-def index(request: Request, _ = Depends(check_auth)):
-    return templates.TemplateResponse(request=request, name="index.html", context={"commands": load_commands(), "output": None, "error": None, "server_name": get_server_name()})
+def index(request: Request, _=Depends(check_auth)):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "commands": load_commands(),
+            "output": None,
+            "error": None,
+            "server_name": get_server_name(),
+        },
+    )
 
 
 @app.post("/settings")
-def update_settings(request: Request, server_name: str = Form(...), _ = Depends(check_auth)):
+def update_settings(
+    request: Request, server_name: str = Form(...), _=Depends(check_auth)
+):
     try:
         settings = load_settings()
         settings["server_name"] = server_name.strip() or "Lucius"
         if not save_settings(settings):
-             return templates.TemplateResponse(
-                request=request, 
-                name="manage.html", 
+            return templates.TemplateResponse(
+                request=request,
+                name="manage.html",
                 context={
-                    "commands": load_commands(), 
-                    "error": "Error: Could not save settings. Check folder permissions.", 
-                    "server_name": get_server_name()
-                }
+                    "commands": load_commands(),
+                    "error": "Error: Could not save settings. Check folder permissions.",
+                    "server_name": get_server_name(),
+                },
             )
         return RedirectResponse(url="/manage", status_code=303)
     except Exception as e:
         return templates.TemplateResponse(
-            request=request, 
-            name="manage.html", 
+            request=request,
+            name="manage.html",
             context={
-                "commands": load_commands(), 
-                "error": f"Internal Error: {str(e)}", 
-                "server_name": get_server_name()
-            }
+                "commands": load_commands(),
+                "error": f"Internal Error: {str(e)}",
+                "server_name": get_server_name(),
+            },
         )
 
 
 @app.get("/manage")
-def manage(request: Request, _ = Depends(check_auth)):
+def manage(request: Request, _=Depends(check_auth)):
     commands = load_commands()
     return templates.TemplateResponse(
-        request=request, name="manage.html", context={"commands": commands, "server_name": get_server_name()}
+        request=request,
+        name="manage.html",
+        context={"commands": commands, "server_name": get_server_name()},
     )
 
 
 @app.post("/run")
-def run_command(request: Request, command: str = Form(...), _ = Depends(check_auth)):
+def run_command(request: Request, command: str = Form(...), _=Depends(check_auth)):
     commands_dict = load_commands()
-    
+
     # 1. Security: check if the key exists in commands.json
     if command not in commands_dict:
         return templates.TemplateResponse(
@@ -131,15 +164,15 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
                 "output": None,
                 "error": "Security Error: Unauthorized command.",
                 "commands": commands_dict,
-                "server_name": get_server_name()
+                "server_name": get_server_name(),
             },
         )
-        
-    # 2. Get the actual command string and split it
+
+    # 2. Get the actual command string and split it safely
     actual_cmd_string = commands_dict[command]
-    cmd_list = actual_cmd_string.split()
+    cmd_list = shlex.split(actual_cmd_string)
     print(f"Running command: {cmd_list}")
-    
+
     output = None
     error = None
     try:
@@ -160,7 +193,7 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
     except FileNotFoundError:
         # Handle the case where the executable (e.g., 'uptime') is not found in the system
         error = f"Error: Executable not found for '{cmd_list[0]}'"
-        
+
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -168,15 +201,18 @@ def run_command(request: Request, command: str = Form(...), _ = Depends(check_au
             "output": output,
             "error": error,
             "commands": commands_dict,
-            "server_name": get_server_name()
+            "server_name": get_server_name(),
         },
     )
 
+
 @app.post("/add")
-def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _ = Depends(check_auth)):
+def add_command(
+    request: Request, name: str = Form(...), cmd: str = Form(...), _=Depends(check_auth)
+):
     name = name.strip()
     cmd = cmd.strip()
-    
+
     # 1. Validate name: no spaces, only alphanumerics and underscores
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
@@ -185,12 +221,12 @@ def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _
             context={
                 "commands": load_commands(),
                 "error": "Error: Name can only contain letters, numbers, and underscores.",
-                "server_name": get_server_name()
-            }
+                "server_name": get_server_name(),
+            },
         )
-        
+
     commands = load_commands()
-    
+
     # 2. Validate name: must not already exist
     if name in commands:
         return templates.TemplateResponse(
@@ -199,52 +235,66 @@ def add_command(request: Request, name: str = Form(...), cmd: str = Form(...), _
             context={
                 "commands": commands,
                 "error": f"Error: A command named '{name}' already exists.",
-                "server_name": get_server_name()
-            }
+                "server_name": get_server_name(),
+            },
         )
-        
+
     # Save new command
     commands[name] = cmd
     save_commands(commands)
-    
+
     # GET Redirect to /manage to reload the page
     return RedirectResponse(url="/manage", status_code=303)
 
 
 @app.post("/delete")
-def delete_command(request: Request, name: str = Form(...), _ = Depends(check_auth)):
+def delete_command(request: Request, name: str = Form(...), _=Depends(check_auth)):
     commands = load_commands()
     if name in commands:
         del commands[name]
         save_commands(commands)
-        
+
     return RedirectResponse(url="/manage", status_code=303)
 
 
 @app.post("/edit")
-def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), old_name: str = Form(...), _ = Depends(check_auth)):
+def edit_command(
+    request: Request,
+    name: str = Form(...),
+    cmd: str = Form(...),
+    old_name: str = Form(...),
+    _=Depends(check_auth),
+):
     name = name.strip()
     cmd = cmd.strip()
-    
+
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
-            request=request, name="manage.html", context={
-                "commands": load_commands(), "error": "Error: Name can only contain letters, numbers, and underscores.", "server_name": get_server_name()
-            }
+            request=request,
+            name="manage.html",
+            context={
+                "commands": load_commands(),
+                "error": "Error: Name can only contain letters, numbers, and underscores.",
+                "server_name": get_server_name(),
+            },
         )
-        
+
     commands = load_commands()
-    
+
     if old_name not in commands:
-         return RedirectResponse(url="/manage", status_code=303)
-         
+        return RedirectResponse(url="/manage", status_code=303)
+
     if name != old_name and name in commands:
         return templates.TemplateResponse(
-            request=request, name="manage.html", context={
-                "commands": commands, "error": f"Error: A command named '{name}' already exists.", "server_name": get_server_name()
-            }
+            request=request,
+            name="manage.html",
+            context={
+                "commands": commands,
+                "error": f"Error: A command named '{name}' already exists.",
+                "server_name": get_server_name(),
+            },
         )
-        
+
     # Preserve key order while replacing old_name with name
     new_commands = {}
     for k, v in commands.items():
@@ -253,16 +303,16 @@ def edit_command(request: Request, name: str = Form(...), cmd: str = Form(...), 
         else:
             new_commands[k] = v
     save_commands(new_commands)
-    
+
     return RedirectResponse(url="/manage", status_code=303)
 
 
 @app.post("/reorder")
-async def reorder_commands(request: Request, _ = Depends(check_auth)):
+async def reorder_commands(request: Request, _=Depends(check_auth)):
     content_type = request.headers.get("content-type", "")
     commands = load_commands()
     keys = list(commands.keys())
-    
+
     # Drag-and-drop JSON payload
     if "application/json" in content_type:
         try:
@@ -281,26 +331,26 @@ async def reorder_commands(request: Request, _ = Depends(check_auth)):
         except Exception as e:
             return {"status": "error", "message": str(e)}
         return {"status": "bad_request"}
-        
+
     # Standard Form submission (Arrow buttons)
     form = await request.form()
     name = form.get("name")
     direction = form.get("direction")
-    
+
     if name in keys:
         idx = keys.index(name)
         if direction == "up" and idx > 0:
             keys[idx], keys[idx - 1] = keys[idx - 1], keys[idx]
         elif direction == "down" and idx < len(keys) - 1:
             keys[idx], keys[idx + 1] = keys[idx + 1], keys[idx]
-            
+
         reordered = {k: commands[k] for k in keys}
         save_commands(reordered)
-        
-    return RedirectResponse(url=f"/manage#cmd-{name}", status_code=303)
 
+    return RedirectResponse(url=f"/manage#cmd-{name}", status_code=303)
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
