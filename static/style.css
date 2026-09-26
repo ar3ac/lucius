@@ -216,6 +216,7 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    min-width: 0;
     gap: 0.35rem;
     overflow: hidden;
 }
@@ -424,6 +425,9 @@ h1, h2, h3 {
 .manage-panel li .cmd-text {
     font-family: var(--font-mono);
     color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .section-title {
@@ -498,6 +502,7 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    min-width: 0;
 }
 
 @media (min-width: 640px) {
