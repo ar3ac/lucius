@@ -16,7 +16,9 @@ import subprocess, json, re, os, shlex, asyncio, secrets
 from datetime import datetime
 
 load_dotenv()
-LUCIUS_PIN = os.getenv("LUCIUS_PIN", "1234")
+LUCIUS_PIN = os.getenv("LUCIUS_PIN")
+if not LUCIUS_PIN:
+    raise ValueError("CRITICAL: LUCIUS_PIN environment variable is not set. Refusing to start.")
 SESSION_TOKEN = secrets.token_urlsafe(32)
 
 app = FastAPI()
