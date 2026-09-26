@@ -20,7 +20,9 @@
         <h2 class="section-title">Commands</h2>
         <div class="command-grid">
         {% for command, command_params in commands.items() %}
-            {% set cmd_lower = (command ~ ' ' ~ command_params).lower() %}
+            {% if command_params.get('enabled', True) %}
+            {% set cmd_str = command_params.cmd if command_params is mapping else command_params %}
+            {% set cmd_lower = (command ~ ' ' ~ cmd_str).lower() %}
             {% if 'shutdown' in cmd_lower or 'poweroff' in cmd_lower %}
                 {% set icon_class = 'fa-power-off' %}
                 {% set btn_theme = 'theme-danger' %}
@@ -68,6 +70,7 @@
                     </div>
                 </button>
             </form>
+            {% endif %}
         {% else %}
             <p style="color: var(--text-muted); text-align: center; grid-column: 1 / -1; margin-top: 2rem; font-size: 1.1rem;">No commands configured. Go to manage to add some.</p>
         {% endfor %}

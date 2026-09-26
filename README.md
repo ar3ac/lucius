@@ -185,6 +185,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## 🙏 Credits & Acknowledgments
 
 Lucius is built on the shoulders of these fantastic open-source projects:
+
 - **[FastAPI](https://fastapi.tiangolo.com/) & [Uvicorn](https://www.uvicorn.org/)** for the blazingly fast backend
 - **[Jinja2](https://jinja.palletsprojects.com/)** for the rock-solid HTML templating
 - **[FontAwesome](https://fontawesome.com/)** for the beautiful icons

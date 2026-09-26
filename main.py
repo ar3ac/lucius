@@ -72,7 +72,15 @@ def get_server_name():
 def load_commands():
     try:
         with open("commands.json", "r") as f:
-            return json.load(f)
+            data = json.load(f)
+            migrated = False
+            for k, v in list(data.items()):
+                if isinstance(v, str):
+                    data[k] = {"cmd": v, "enabled": True}
+                    migrated = True
+            if migrated:
+                save_commands(data)
+            return data
     except (FileNotFoundError, json.JSONDecodeError):
         return {}
 
@@ -228,7 +236,7 @@ def run_command(request: Request, command: str = Form(...), _=Depends(check_auth
         )
 
     # 2. Get the actual command string and split it safely
-    actual_cmd_string = commands_dict[command]
+    actual_cmd_string = commands_dict[command]["cmd"]
     cmd_list = shlex.split(actual_cmd_string)
     print(f"Running command: {cmd_list}")
 
@@ -279,7 +287,7 @@ async def websocket_run(websocket: WebSocket, command: str):
         await websocket.close()
         return
 
-    actual_cmd_string = commands_dict[command]
+    actual_cmd_string = commands_dict[command]["cmd"]
     cmd_list = shlex.split(actual_cmd_string)
 
     await websocket.send_text(f"$ {actual_cmd_string}\n")
@@ -362,7 +370,7 @@ def add_command(
         )
 
     # Save new command
-    commands[name] = cmd
+    commands[name] = {"cmd": cmd, "enabled": True}
     save_commands(commands)
 
     # GET Redirect to /manage to reload the page
@@ -421,12 +429,21 @@ def edit_command(
     new_commands = {}
     for k, v in commands.items():
         if k == old_name:
-            new_commands[name] = cmd
+            new_commands[name] = {"cmd": cmd, "enabled": commands.get(old_name, {}).get("enabled", True)}
         else:
             new_commands[k] = v
     save_commands(new_commands)
 
     return RedirectResponse(url="/manage", status_code=303)
+
+
+@app.post("/toggle")
+def toggle_command(request: Request, name: str = Form(...), _=Depends(check_auth)):
+    commands = load_commands()
+    if name in commands:
+        commands[name]["enabled"] = not commands[name].get("enabled", True)
+        save_commands(commands)
+    return RedirectResponse(url=f"/manage#cmd-{name}", status_code=303)
 
 
 @app.post("/reorder")
