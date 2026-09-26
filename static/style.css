@@ -13,8 +13,20 @@
     --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
 }
 
+:root[data-theme="dark"] {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --accent-color: #6366f1;
+    --accent-hover: #818cf8;
+    --terminal-bg: #000000;
+    --terminal-text: #34d399;
+}
+
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --bg-color: #0f172a;
         --card-bg: #1e293b;
         --text-main: #f8fafc;

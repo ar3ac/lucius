@@ -18,6 +18,25 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Lucius">
     <link rel="apple-touch-icon" href="/static/icon-192.png">
+    
+    <script>
+        const savedTheme = localStorage.getItem('lucius-theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark' || 
+                (!html.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            const newTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('lucius-theme', newTheme);
+            const icon = document.getElementById('theme-icon');
+            if (icon) {
+                icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+    </script>
 
     {% block title %}{% endblock %}
     
