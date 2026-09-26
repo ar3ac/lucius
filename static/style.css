@@ -155,11 +155,13 @@ h1, h2, h3 {
 .command-form {
     margin: 0;
     width: 100%;
+    min-width: 0;
 }
 
 .command-card {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
     overflow: hidden;
     min-height: 112px;
     background: var(--card-bg);
@@ -216,7 +218,6 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    min-width: 0;
     gap: 0.35rem;
     overflow: hidden;
 }
@@ -428,6 +429,7 @@ h1, h2, h3 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
 }
 
 .section-title {
@@ -502,7 +504,6 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    min-width: 0;
 }
 
 @media (min-width: 640px) {
