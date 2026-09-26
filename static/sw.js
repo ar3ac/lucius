@@ -1,8 +1,6 @@
-const CACHE_NAME = 'lucius-cache-v1';
+const CACHE_NAME = 'lucius-cache-v2';
+
 const urlsToCache = [
-  '/',
-  '/login',
-  '/static/style.css',
   '/static/manifest.json',
   '/static/icon-192.png',
   '/static/icon-512.png',
@@ -15,23 +13,41 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting()) // Force immediate activation
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName); // Delete old caches
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  // Only cache GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
+  if (event.request.method !== 'GET') return;
   
+  // Network-first strategy for everything to ensure freshness
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Return cached response if found, else fetch from network
-        return response || fetch(event.request).then(fetchResponse => {
-            // Optional: dynamically cache new requests here if needed
-            return fetchResponse;
+        // Optionally cache the fresh response
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseClone);
         });
+        return response;
+      })
+      .catch(() => {
+        // Fallback to cache if network fails (offline mode)
+        return caches.match(event.request);
       })
   );
 });
