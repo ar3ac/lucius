@@ -12,11 +12,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from dotenv import load_dotenv
-import subprocess, json, re, os, shlex, asyncio
+import subprocess, json, re, os, shlex, asyncio, secrets
 from datetime import datetime
 
 load_dotenv()
 LUCIUS_PIN = os.getenv("LUCIUS_PIN", "1234")
+SESSION_TOKEN = secrets.token_urlsafe(32)
 
 app = FastAPI()
 
@@ -27,7 +28,7 @@ async def custom_401_handler(request: Request, exc: HTTPException):
 
 
 def check_auth(request: Request):
-    if request.cookies.get("lucius_auth") != "ok":
+    if request.cookies.get("lucius_auth") != SESSION_TOKEN:
         raise HTTPException(status_code=401)
 
 
@@ -133,7 +134,7 @@ def login_post(request: Request, response: Response, pin: str = Form(...)):
     if pin == LUCIUS_PIN:
         redirect = RedirectResponse(url="/", status_code=303)
         redirect.set_cookie(
-            key="lucius_auth", value="ok", httponly=True, max_age=86400 * 30
+            key="lucius_auth", value=SESSION_TOKEN, httponly=True, max_age=86400 * 30
         )  # Expires in 30 days
         return redirect
     return templates.TemplateResponse(
@@ -276,7 +277,7 @@ def run_command(request: Request, command: str = Form(...), _=Depends(check_auth
 @app.websocket("/ws/run/{command}")
 async def websocket_run(websocket: WebSocket, command: str):
     await websocket.accept()
-    if websocket.cookies.get("lucius_auth") != "ok":
+    if websocket.cookies.get("lucius_auth") != SESSION_TOKEN:
         await websocket.send_text("Error: Unauthorized")
         await websocket.close()
         return
