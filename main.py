@@ -338,10 +338,11 @@ async def websocket_run(websocket: WebSocket, command: str):
 
 @app.post("/add")
 def add_command(
-    request: Request, name: str = Form(...), cmd: str = Form(...), _=Depends(check_auth)
+    request: Request, name: str = Form(...), cmd: str = Form(...), confirm: str = Form(None), _=Depends(check_auth)
 ):
     name = name.strip()
     cmd = cmd.strip()
+    is_confirm = confirm == "on"
 
     # 1. Validate name: no spaces, only alphanumerics and underscores
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
@@ -370,7 +371,7 @@ def add_command(
         )
 
     # Save new command
-    commands[name] = {"cmd": cmd, "enabled": True}
+    commands[name] = {"cmd": cmd, "enabled": True, "confirm": is_confirm}
     save_commands(commands)
 
     # GET Redirect to /manage to reload the page
@@ -393,10 +394,12 @@ def edit_command(
     name: str = Form(...),
     cmd: str = Form(...),
     old_name: str = Form(...),
+    confirm: str = Form(None),
     _=Depends(check_auth),
 ):
     name = name.strip()
     cmd = cmd.strip()
+    is_confirm = confirm == "on"
 
     if not re.match(r"^[a-zA-Z0-9_]+$", name):
         return templates.TemplateResponse(
@@ -432,6 +435,7 @@ def edit_command(
             new_commands[name] = {
                 "cmd": cmd,
                 "enabled": commands.get(old_name, {}).get("enabled", True),
+                "confirm": is_confirm,
             }
         else:
             new_commands[k] = v

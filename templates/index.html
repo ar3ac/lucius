@@ -55,7 +55,7 @@
                 {% set btn_theme = 'theme-primary' %}
             {% endif %}
 
-            <form action="/run#output-section" method="post" class="command-form" onsubmit="handleCommandSubmit(this)">
+            <form action="/run#output-section" method="post" class="command-form" onsubmit="handleCommandSubmit(this)" data-confirm="{{ 'true' if command_params.get('confirm') else 'false' }}">
                 <input type="hidden" name="command" value="{{ command }}">
                 <button type="submit" class="command-card {{ btn_theme }}">
                     <div class="command-icon-box">
@@ -107,6 +107,14 @@
         event.preventDefault(); // Prevent standard POST
 
         const commandName = form.querySelector('input[name="command"]').value;
+        const requiresConfirm = form.dataset.confirm === 'true';
+        
+        if (requiresConfirm) {
+            if (!confirm(`Are you sure you want to run: ${commandName}?`)) {
+                return false;
+            }
+        }
+
         const btn = form.querySelector('.command-card');
         const actionIcon = form.querySelector('.command-action i');
         
