@@ -429,7 +429,10 @@ def edit_command(
     new_commands = {}
     for k, v in commands.items():
         if k == old_name:
-            new_commands[name] = {"cmd": cmd, "enabled": commands.get(old_name, {}).get("enabled", True)}
+            new_commands[name] = {
+                "cmd": cmd,
+                "enabled": commands.get(old_name, {}).get("enabled", True),
+            }
         else:
             new_commands[k] = v
     save_commands(new_commands)
