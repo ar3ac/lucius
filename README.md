@@ -21,8 +21,8 @@
     <td align="center"><b>⚙️ Command Management</b></td>
   </tr>
   <tr>
-    <td><img src="assets/screenshot_home.png" width="100%"></td>
-    <td><img src="assets/screenshot_manage.png" width="100%"></td>
+    <td><img src="assets/screenshot_home.jpg" width="100%"></td>
+    <td><img src="assets/screenshot_manage.jpg" width="100%"></td>
   </tr>
 </table>
 
