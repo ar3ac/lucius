@@ -82,16 +82,18 @@ Then open **`http://<your-server-ip>:8000`** from any device on your network.
 Since Lucius is often used on local networks without HTTPS, browsers might hide the automatic "Install App" prompt. Here is how you can still add it to your home screen with the custom logo:
 
 **🍏 iOS (iPhone / iPad)**
+
 1. Open **Safari** and navigate to your Lucius dashboard (e.g., `http://192.168.1.84:8000`).
 2. Tap the **Share** button (the square with an upward arrow at the bottom).
 3. Scroll down and tap **"Add to Home Screen"**.
 4. Tap **Add**. Lucius will now behave like a native app!
 
 **🤖 Android (Chrome)**
+
 1. Open **Chrome** and navigate to your Lucius dashboard.
 2. Tap the **3-dot menu** in the top right corner.
 3. Select **"Add to Home screen"**.
-4. *(Optional for Power Users)*: To unlock the full offline caching without HTTPS, type `chrome://flags` in the address bar, search for **"Insecure origins treated as secure"**, enable it, and enter your server's URL. Relaunch Chrome and the native Install prompt will appear.
+4. _(Optional for Power Users)_: To unlock the full offline caching without HTTPS, type `chrome://flags` in the address bar, search for **"Insecure origins treated as secure"**, enable it, and enter your server's URL. Relaunch Chrome and the native Install prompt will appear.
 
 ---
 
@@ -170,7 +172,7 @@ lucius/
 
 If you find Lucius useful and want to support its development, feel free to buy me a coffee!
 
-[![Donate via PayPal](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge&logo=paypal)](https://py.pl/WNQOC0WPuLs2xdEitk4Anw)
+<a href="https://www.buymeacoffee.com/ar3ac" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
 ---
 
