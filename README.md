@@ -172,7 +172,7 @@ lucius/
 
 If you find Lucius useful and want to support its development, feel free to buy me a coffee!
 
-<a href="https://www.buymeacoffee.com/ar3ac" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<a href="https://ko-fi.com/ar3ac" target="_blank"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi" style="height: 40px !important;"></a>
 
 ---
 

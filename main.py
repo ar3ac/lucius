@@ -338,7 +338,11 @@ async def websocket_run(websocket: WebSocket, command: str):
 
 @app.post("/add")
 def add_command(
-    request: Request, name: str = Form(...), cmd: str = Form(...), confirm: str = Form(None), _=Depends(check_auth)
+    request: Request,
+    name: str = Form(...),
+    cmd: str = Form(...),
+    confirm: str = Form(None),
+    _=Depends(check_auth),
 ):
     name = name.strip()
     cmd = cmd.strip()
