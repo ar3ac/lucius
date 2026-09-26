@@ -12,13 +12,15 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from dotenv import load_dotenv
-import subprocess, json, re, os, shlex, asyncio, secrets
+import subprocess, json, re, os, shlex, asyncio, secrets, time
 from datetime import datetime
 
 load_dotenv()
 LUCIUS_PIN = os.getenv("LUCIUS_PIN")
 if not LUCIUS_PIN:
-    raise ValueError("CRITICAL: LUCIUS_PIN environment variable is not set. Refusing to start.")
+    raise ValueError(
+        "CRITICAL: LUCIUS_PIN environment variable is not set. Refusing to start."
+    )
 SESSION_TOKEN = secrets.token_urlsafe(32)
 
 app = FastAPI()
@@ -131,14 +133,34 @@ def login_get(request: Request):
     return templates.TemplateResponse(request=request, name="login.html")
 
 
+FAILED_ATTEMPTS = 0
+LAST_FAILED_TIME = 0
+
 @app.post("/login")
 def login_post(request: Request, response: Response, pin: str = Form(...)):
+    global FAILED_ATTEMPTS, LAST_FAILED_TIME
+    
+    # 60 seconds lockout after 5 failed attempts
+    if FAILED_ATTEMPTS >= 5:
+        if time.time() - LAST_FAILED_TIME < 60:
+            return templates.TemplateResponse(
+                request=request, 
+                name="login.html", 
+                context={"error": "Too many failed attempts. Please wait 60 seconds."}
+            )
+        else:
+            FAILED_ATTEMPTS = 0
+
     if pin == LUCIUS_PIN:
+        FAILED_ATTEMPTS = 0
         redirect = RedirectResponse(url="/", status_code=303)
         redirect.set_cookie(
             key="lucius_auth", value=SESSION_TOKEN, httponly=True, max_age=86400 * 30
         )  # Expires in 30 days
         return redirect
+    
+    FAILED_ATTEMPTS += 1
+    LAST_FAILED_TIME = time.time()
     return templates.TemplateResponse(
         request=request, name="login.html", context={"error": "Incorrect PIN"}
     )
