@@ -1,4 +1,13 @@
-from fastapi import FastAPI, Request, Form, Depends, HTTPException, Response, WebSocket, WebSocketDisconnect
+from fastapi import (
+    FastAPI,
+    Request,
+    Form,
+    Depends,
+    HTTPException,
+    Response,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -72,8 +81,10 @@ def save_commands(commands):
     with open("commands.json", "w") as f:
         json.dump(commands, f, indent=4)
 
+
 LOGS_FILE = "history.json"
 MAX_LOGS = 50
+
 
 def append_log(command_name, cmd_string, success, output):
     logs = []
@@ -83,18 +94,20 @@ def append_log(command_name, cmd_string, success, output):
                 logs = json.load(f)
         except:
             pass
-            
+
     log_entry = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "command": command_name,
         "script": cmd_string,
         "success": success,
-        "output": output[-1000:] if output else "" # Keep last 1000 chars to avoid huge files
+        "output": (
+            output[-1000:] if output else ""
+        ),  # Keep last 1000 chars to avoid huge files
     }
-    
+
     logs.insert(0, log_entry)
     logs = logs[:MAX_LOGS]
-    
+
     try:
         with open(LOGS_FILE, "w") as f:
             json.dump(logs, f, indent=4)
@@ -140,6 +153,7 @@ def index(request: Request, _=Depends(check_auth)):
         },
     )
 
+
 @app.get("/logs")
 def view_logs(request: Request, _=Depends(check_auth)):
     logs = []
@@ -152,10 +166,7 @@ def view_logs(request: Request, _=Depends(check_auth)):
     return templates.TemplateResponse(
         request=request,
         name="logs.html",
-        context={
-            "logs": logs,
-            "server_name": get_server_name()
-        }
+        context={"logs": logs, "server_name": get_server_name()},
     )
 
 
@@ -267,44 +278,45 @@ async def websocket_run(websocket: WebSocket, command: str):
         await websocket.send_text("Security Error: Unauthorized command.")
         await websocket.close()
         return
-        
+
     actual_cmd_string = commands_dict[command]
     cmd_list = shlex.split(actual_cmd_string)
-    
+
     await websocket.send_text(f"$ {actual_cmd_string}\n")
-    
+
     full_output = []
-    
+
     try:
         process = await asyncio.create_subprocess_exec(
-            *cmd_list,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT
+            *cmd_list, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
         )
-        
+
         while True:
             line = await process.stdout.readline()
             if not line:
                 break
-            decoded_line = line.decode('utf-8', errors='replace')
+            decoded_line = line.decode("utf-8", errors="replace")
             full_output.append(decoded_line)
             await websocket.send_text(decoded_line)
-            
+
         await process.wait()
-        
+
         if process.returncode == 0:
             append_log(command, actual_cmd_string, True, "".join(full_output))
             await websocket.send_text(f"\n[Process exited with code 0]")
         else:
             append_log(command, actual_cmd_string, False, "".join(full_output))
-            await websocket.send_text(f"\n[Process exited with code {process.returncode}]")
-            
+            await websocket.send_text(
+                f"\n[Process exited with code {process.returncode}]"
+            )
+
     except Exception as e:
         err_msg = str(e)
         append_log(command, actual_cmd_string, False, err_msg)
         await websocket.send_text(f"\nError executing command: {err_msg}")
-        
+
     await websocket.close()
+
 
 @app.post("/add")
 def add_command(
