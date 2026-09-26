@@ -9,15 +9,6 @@
             <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--border-color); padding: 0.125rem 0.5rem; border-radius: 1rem;"><i class="fas fa-server"></i> {{ server_name }}</span>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <button onclick="toggleTheme()" class="manage-link" title="Toggle Theme" style="cursor: pointer;">
-                <i id="theme-icon" class="fas fa-moon"></i>
-            </button>
-            <script>
-                document.getElementById('theme-icon').className = 
-                    (document.documentElement.getAttribute('data-theme') === 'dark' || 
-                    (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
-                    ? 'fas fa-sun' : 'fas fa-moon';
-            </script>
             <a class="manage-link" href="/logs"><i class="fas fa-history"></i> Logs</a>
             <a class="manage-link" href="/manage"><i class="fas fa-cog"></i> Manage</a>
             <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></a>

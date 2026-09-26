@@ -9,21 +9,44 @@
             <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--border-color); padding: 0.125rem 0.5rem; border-radius: 1rem;"><i class="fas fa-server"></i> {{ server_name }}</span>
         </div>
         <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <button onclick="toggleTheme()" class="manage-link" title="Toggle Theme" style="cursor: pointer;">
-                <i id="theme-icon" class="fas fa-moon"></i>
-            </button>
-            <script>
-                document.getElementById('theme-icon').className = 
-                    (document.documentElement.getAttribute('data-theme') === 'dark' || 
-                    (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
-                    ? 'fas fa-sun' : 'fas fa-moon';
-            </script>
             <a class="manage-link" href="/"><i class="fas fa-home"></i> Back to lucius</a>
             <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </header>
 
     <br>
+    <section class="manage-panel" style="margin-bottom: 2rem;">
+        <h2 class="section-title">🎨 Theme Settings</h2>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong style="display: block; margin-bottom: 0.25rem;">Appearance</strong>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">Toggle between dark and light mode manually.</span>
+            </div>
+            <button type="button" onclick="toggleTheme()" class="command-btn primary-btn" style="width: auto; padding: 0.5rem 1rem;">
+                <i id="theme-icon-manage" class="fas fa-moon"></i> <span id="theme-text">Toggle Theme</span>
+            </button>
+        </div>
+        <script>
+            function updateThemeUI() {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                    (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                const icon = document.getElementById('theme-icon-manage');
+                const text = document.getElementById('theme-text');
+                if (icon && text) {
+                    icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                    text.innerText = isDark ? 'Switch to Light' : 'Switch to Dark';
+                }
+            }
+            // Override toggleTheme in this page to also update local UI
+            const originalToggle = toggleTheme;
+            toggleTheme = function() {
+                originalToggle();
+                updateThemeUI();
+            };
+            document.addEventListener('DOMContentLoaded', updateThemeUI);
+        </script>
+    </section>
+
     <section class="manage-panel" style="margin-bottom: 2rem;">
         <h2 class="section-title">⚙️ Server Settings</h2>
         <form action="/settings" method="post" class="add-form">
