@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}
+    <title>Lucius Logs</title>
+{% endblock %}
+{% block content %}
+    <header class="top-bar">
+        <div>
+            <a href="/" style="text-decoration: none; color: inherit;">
+                <h1 style="margin-bottom: 0.25rem;"><i class="fas fa-terminal"></i> lucius</h1>
+            </a>
+            <span style="font-size: 0.75rem; color: var(--text-muted); background: var(--border-color); padding: 0.125rem 0.5rem; border-radius: 1rem;"><i class="fas fa-server"></i> {{ server_name }}</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button onclick="toggleTheme()" class="manage-link" style="background:none; border:none; cursor:pointer;" title="Toggle Theme">
+                <i id="theme-icon" class="fas fa-moon"></i>
+            </button>
+            <script>
+                document.getElementById('theme-icon').className = 
+                    (document.documentElement.getAttribute('data-theme') === 'dark' || 
+                    (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
+                    ? 'fas fa-sun' : 'fas fa-moon';
+            </script>
+            <a class="manage-link" href="/"><i class="fas fa-home"></i> Dashboard</a>
+        </div>
+    </header>
+
+    <main style="display: flex; flex-direction: column; width: 100%; margin: 1rem 0;">
+        <section class="command-grid-section">
+            <h2 class="section-title"><i class="fas fa-history"></i> Execution History</h2>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for log in logs %}
+                <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div>
+                            <strong style="font-size: 1.1rem;">{{ log.command }}</strong>
+                            <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 0.5rem;">{{ log.timestamp }}</span>
+                        </div>
+                        {% if log.success %}
+                            <span style="color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600;">SUCCESS</span>
+                        {% else %}
+                            <span style="color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600;">FAILED</span>
+                        {% endif %}
+                    </div>
+                    <code style="display: block; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">$ {{ log.script }}</code>
+                    
+                    {% if log.output %}
+                    <pre style="background: var(--terminal-bg); color: var(--terminal-text); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; max-height: 200px; overflow-y: auto; margin: 0; white-space: pre-wrap; word-break: break-word;">{{ log.output }}</pre>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p style="color: var(--text-muted); text-align: center; margin-top: 2rem;">No execution history found.</p>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+{% endblock %}

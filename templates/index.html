@@ -18,8 +18,9 @@
                     (!document.documentElement.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) 
                     ? 'fas fa-sun' : 'fas fa-moon';
             </script>
-            <a class="manage-link" href="/manage"><i class="fas fa-cog"></i> Manage commands</a>
-            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a class="manage-link" href="/logs"><i class="fas fa-history"></i> Logs</a>
+            <a class="manage-link" href="/manage"><i class="fas fa-cog"></i> Manage</a>
+            <a class="manage-link" href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></a>
         </div>
     </header>
     
@@ -83,6 +84,14 @@
     </section>
     </main>
 
+    <!-- Websocket Output Section (Hidden by default) -->
+    <section id="ws-output-section" style="margin-top: 2.5rem; display: none;">
+        <h2 class="section-title"><i class="fas fa-terminal"></i> Live Output <span id="ws-status" style="font-size:0.8rem; font-weight:normal; margin-left:1rem;"></span></h2>
+        <div class="output">
+            <pre id="ws-terminal" style="margin: 0; white-space: pre-wrap; word-break: break-word;"></pre>
+        </div>
+    </section>
+
     {% if output or error %}
     <section id="output-section" style="margin-top: 2.5rem;">
         <h2 class="section-title"><i class="fas fa-terminal"></i> Command Output</h2>
@@ -101,14 +110,60 @@
 
     <script>
     function handleCommandSubmit(form) {
+        event.preventDefault(); // Prevent standard POST
+
+        const commandName = form.querySelector('input[name="command"]').value;
         const btn = form.querySelector('.command-card');
         const actionIcon = form.querySelector('.command-action i');
-        if (btn) {
-            btn.classList.add('is-running');
-            if (actionIcon) {
-                actionIcon.className = 'fas fa-spinner fa-spin';
-            }
-        }
+        
+        // UI Loading State
+        if (btn) btn.classList.add('is-running');
+        if (actionIcon) actionIcon.className = 'fas fa-spinner fa-spin';
+
+        // Hide static output, show live output
+        const staticOutput = document.getElementById('output-section');
+        if (staticOutput) staticOutput.style.display = 'none';
+        
+        const wsSection = document.getElementById('ws-output-section');
+        const wsTerminal = document.getElementById('ws-terminal');
+        const wsStatus = document.getElementById('ws-status');
+        
+        wsSection.style.display = 'block';
+        wsTerminal.innerText = '';
+        wsStatus.innerText = '(Connecting...)';
+        wsStatus.style.color = 'var(--text-muted)';
+        
+        wsSection.scrollIntoView({ behavior: 'smooth' });
+
+        // Connect WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${protocol}//${window.location.host}/ws/run/${commandName}`);
+
+        ws.onopen = function() {
+            wsStatus.innerText = '(Running)';
+            wsStatus.style.color = '#10b981';
+        };
+
+        ws.onmessage = function(event) {
+            wsTerminal.innerText += event.data;
+            // Auto scroll to bottom
+            wsTerminal.parentElement.scrollTop = wsTerminal.parentElement.scrollHeight;
+        };
+
+        ws.onclose = function() {
+            wsStatus.innerText = '(Finished)';
+            wsStatus.style.color = 'var(--text-muted)';
+            if (btn) btn.classList.remove('is-running');
+            if (actionIcon) actionIcon.className = 'fas fa-play';
+        };
+
+        ws.onerror = function(err) {
+            wsTerminal.innerText += '\n[WebSocket Connection Error]\n';
+            if (btn) btn.classList.remove('is-running');
+            if (actionIcon) actionIcon.className = 'fas fa-play';
+        };
+        
+        return false;
     }
     </script>
 {% endblock %}
