@@ -285,7 +285,9 @@ async def websocket_run(websocket: WebSocket, command: str):
     await websocket.send_text(f"$ {actual_cmd_string}\n")
 
     full_output = []
-
+    output_size = 0
+    MAX_LOG_SIZE = 50000 # 50 KB max log memory per command
+    
     try:
         process = await asyncio.create_subprocess_exec(
             *cmd_list, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
@@ -296,7 +298,15 @@ async def websocket_run(websocket: WebSocket, command: str):
             if not line:
                 break
             decoded_line = line.decode("utf-8", errors="replace")
-            full_output.append(decoded_line)
+            
+            # Keep memory bounded
+            if output_size < MAX_LOG_SIZE:
+                full_output.append(decoded_line)
+                output_size += len(decoded_line)
+            elif output_size == MAX_LOG_SIZE:
+                full_output.append("\n...[Output truncated for history log]...\n")
+                output_size += 1 # prevent further appends
+                
             await websocket.send_text(decoded_line)
 
         await process.wait()
