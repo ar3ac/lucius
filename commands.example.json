@@ -1,7 +1,22 @@
 {
-    "shutdown": "sudo shutdown -h now",
-    "reboot": "sudo reboot",
-    "restart_minidlna": "sudo systemctl restart minidlna",
-    "uptime": "uptime -p",
-    "Memory": "free -h"
+    "reboot": {
+        "cmd": "sudo reboot",
+        "enabled": true,
+        "confirm": true
+    },
+    "uptime": {
+        "cmd": "uptime -p",
+        "enabled": true,
+        "confirm": false
+    },
+    "memory": {
+        "cmd": "free -h",
+        "enabled": true,
+        "confirm": false
+    },
+    "update_lucius": {
+        "cmd": "sudo /opt/lucius/update.sh",
+        "enabled": true,
+        "confirm": true
+    }
 }
