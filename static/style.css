@@ -93,7 +93,7 @@ h1, h2, h3 {
     gap: 0.35rem;
 }
 
-.top-bar a {
+.top-bar a, .top-bar button {
     color: var(--text-muted);
     text-decoration: none;
     font-size: 0.95rem;
@@ -103,9 +103,10 @@ h1, h2, h3 {
     transition: all 0.2s;
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
+    font-family: inherit;
 }
 
-.top-bar a:hover {
+.top-bar a:hover, .top-bar button:hover {
     background-color: var(--border-color);
     color: var(--text-main);
 }
