@@ -182,6 +182,16 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ---
 
+## 🙏 Credits & Acknowledgments
+
+Lucius is built on the shoulders of these fantastic open-source projects:
+- **[FastAPI](https://fastapi.tiangolo.com/) & [Uvicorn](https://www.uvicorn.org/)** for the blazingly fast backend
+- **[Jinja2](https://jinja.palletsprojects.com/)** for the rock-solid HTML templating
+- **[FontAwesome](https://fontawesome.com/)** for the beautiful icons
+- **[Inter Font](https://fonts.google.com/specimen/Inter)** by Google Fonts
+
+---
+
 <div align="center">
-Made with ☕ and Python · <a href="https://github.com/ar3ac/lucius">github.com/ar3ac/lucius</a>
+Made with ☕ and Python by <strong>Luca Marrazzo</strong> (<a href="https://github.com/ar3ac">@ar3ac</a>)
 </div>
