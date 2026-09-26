@@ -45,6 +45,7 @@ You have a Raspberry Pi, a home server, or a VPS. You need to restart a service,
 ## ✨ Features
 
 - 📱 **Mobile-First & High Accessibility** — huge thumb-friendly action cards with instant visual recognition (large icons, high-contrast typography, color-coded themes), effortless to tap even without glasses
+- 📲 **PWA Ready** — installable directly on your phone's home screen as a native-like app (no browser bars) with offline caching
 - ⚡ **One-tap execution** — no typing, no SSH, no friction
 - 🛡️ **Secure by design** — PIN auth + strict command whitelist (no shell injection possible)
 - ⚙️ **Web-based management** — add, edit, delete, and reorder commands from the UI, no config files to edit
