@@ -24,11 +24,11 @@ def check_auth(request: Request):
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/sw.js")
 def service_worker():
     return Response(
-        content=open("static/sw.js", "r").read(),
-        media_type="application/javascript"
+        content=open("static/sw.js", "r").read(), media_type="application/javascript"
     )
 
 
